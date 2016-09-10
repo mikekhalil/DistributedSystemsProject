@@ -1,12 +1,26 @@
 {
     "name" : "DistributedSystemsProject",
     "version" : "0.0.1",
-    "main" : "master.js",
-    "start" : "master.js",
-    "author" : "Michael Khalil, Paul Heldring, Sameet Mohanty",
+    "scripts" : {
+        "prestart": "npm install",
+        "start" : "node master.js"
+    },
+    "contributors": [
+        {
+            "name" : "Michel Khalil",
+            "email" : "mkhalil@purdue.edu"
+        },
+        {
+            "name" : "Paul Heldring",
+            "email" : "pheldrin@purdue.edu"
+        },
+        {
+            "name" : "Sameet Mohanty",
+            "email" : "mohanty0@purdue.edu" 
+        }
+    ],
     "description" : "A cross platform, distributed computing solution",
     "dependencies" : {
         "express" : "latest"
     }
-    
 }

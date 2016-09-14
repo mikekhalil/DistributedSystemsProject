@@ -21,6 +21,7 @@
     ],
     "description" : "A cross platform, distributed computing solution",
     "dependencies" : {
-        "express" : "latest"
+        "express" : "4.14.0",
+        "postal" : "2.0.4"  
     }
 }

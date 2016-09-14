@@ -1,11 +1,11 @@
 // require stuff
-var express = require('express');
-
+var Express = require('express');
+var MessageBroker = require('/modules./channel.js');
 
 
 
 //initalize stuff
-var app = express();
+var app = Express();
 
 app.get('/', function (req, res) {
     res.send('<h1> Hello World </h1> ');

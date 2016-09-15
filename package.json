@@ -3,7 +3,7 @@
     "version" : "0.0.1",
     "scripts" : {
         "prestart": "npm install",
-        "start" : "node master.js"
+        "start" : "node Server.js"
     },
     "contributors": [
         {

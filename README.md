@@ -5,7 +5,7 @@ Requirements:
 
 
 There are 2 easy ways to start the service
-    1) Run 'npm install', then run 'node master.js'
+    1) Run 'npm install', then run 'node Server.js'
 
     Or 
 

@@ -23,6 +23,6 @@
     "dependencies" : {
         "express" : "4.14.0",
         "postal" : "2.0.4",
-        "multer" : "1.2.0"
+        "multer" : "1.0.5"
     }
 }

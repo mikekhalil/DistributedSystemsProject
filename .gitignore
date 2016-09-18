@@ -3,3 +3,7 @@
 
 #ignore logs
 npm-debug.log
+
+#ignore input files
+
+

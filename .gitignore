@@ -5,5 +5,5 @@
 npm-debug.log
 
 #ignore input files
-
+/InputFiles/**
 

@@ -3,7 +3,7 @@
  * Written by Paul Heldring
  */
 
-function SplitInput( file ) {
+var func = function SplitInput( file ) {
 
     var fs = require('fs'); 
     var splitDir = '/splits/';	/* dir where splits are stored. */
@@ -16,7 +16,7 @@ function SplitInput( file ) {
     var filepath = '';		/* full path of split		*/
 
     if (!fs.existsSync(__dirname + splitDir)) {
-	fs.mkdirSync(__dirname + splitDir);
+		fs.mkdirSync(__dirname + splitDir);
     }
 
     fs.readFile( file, encoding, function (err, data) {
@@ -52,4 +52,8 @@ function SplitInput( file ) {
     });
     
     return splits;
+}
+
+module.exports = {
+	splitInput : func
 }

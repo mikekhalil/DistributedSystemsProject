@@ -1,0 +1,7 @@
+{
+    "multer" : {
+        "path" : "InputFiles/",
+        "data" : "dataFile",
+        "type" : "typeOfInput"
+    }
+}

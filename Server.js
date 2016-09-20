@@ -21,6 +21,7 @@ app.get('/', function (req, res) {
 app.post('/InputFiles', uploadData, function (req, res, next) {
     console.log(res.files);
     console.log(req.files);
+    res.end();
 });
 
 app.listen(3000, function() { 

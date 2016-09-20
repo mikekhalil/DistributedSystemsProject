@@ -4,12 +4,22 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
         <script src="assets/js/app.js"></script>
         <script src="components/data_upload/data_upload_controller.js"></script>
+        
+        <script src="assets/libs/dropzone.js"></script>
+        <link rel="stylesheet" type="text/css" href="assets/libs/dropzone.css">
+        <link rel="stylesheet" type="text/css" href="assets/libs/style.css">
     </head>
 
     <body ng-app="cream">
-        <div ng-controller="uploadController">
-            <input type="file" file-model="myFile"/><br><br>
-            <button ng-click="uploadFile()">Upload</button>
+       <main>
+    <section>
+        <h1 style="text-align:center;">Send us your data!</h1>
+        <div id="dropzone">
+            <form action="/InputFiles" class="dropzone dz-clickable" id="demo-upload">
+                <div class="dz-message">Drop files here or click to upload.</div>
+            </form>
         </div>
+    </section>
+</main>
     </body>
     

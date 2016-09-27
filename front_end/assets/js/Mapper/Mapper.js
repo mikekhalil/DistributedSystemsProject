@@ -9,15 +9,33 @@ function wordCount( key, value ) {
     return list;
 }
 
+var shuffledList = new Array();
 var pairs = {};
 
-for (var i in records) {
-    var key = records[i].key;
-    var val = records[i].value; 
-    //console.log(key);
-    //console.log(val);
-
-    pairs = wordCount( key, val );
-
-    console.log(pairs);
+// might have to do binary search
+function indexOfVal( str ) {
+    for (var i in shuffledList) {
+	if (shuffledList[i].key === str) {
+	    return i;
+	}
+    }
+    return -1;
 }
+
+for (var i in records) {
+    // call map function
+    pairs =  wordCount( records[i].key, records[i].value );
+    for (var j in pairs) {
+	var index = indexOfVal(pairs[j].key);
+	if ( index == -1 ) {
+	    // key doesn't exit
+	    var tmp = pairs[j].value;
+	    pairs[j].value = new Array();
+	    pairs[j].value.push(tmp);
+	    shuffledList.push(pairs[j]);
+	} else {
+	    shuffledList[index].value.push(pairs[j].value);
+	}
+    }
+}
+console.log(shuffledList);

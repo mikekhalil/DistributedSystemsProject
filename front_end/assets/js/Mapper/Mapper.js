@@ -21,19 +21,6 @@ function indexOfVal( str ) {
     return -1;
 }
 
-// WHY CAN'T I FIND A STRCMP FUNC IN JAVASCRIPT??
-function strcmp( str1, str2 ) {
-    for ( i in str1 ) {
-	for ( j in str2 ) {
-	    if ( str1[i] > str2[j] )
-		return 1;
-	    else if ( str1[i] < str2[j] )
-		return -1;
-	}
-    }
-    return 0;
-}
-
 for (var i in records) {
     // call map function
     pairs =  wordCount( records[i].key, records[i].value );
@@ -51,5 +38,5 @@ for (var i in records) {
 	}
     }
 }
-shuffledList.sort(function(a, b) { return strcmp(a.key, b.key);});
+shuffledList.sort(function(a, b) { return a.key.localeCompare(b.key);});
 console.log(shuffledList);

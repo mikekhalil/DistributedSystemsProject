@@ -2,8 +2,11 @@
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-route.min.js"></script>
+
         <script src="assets/js/app.js"></script>
         <script src="components/data_upload/data_upload_controller.js"></script>
+        <script src="assets/js/RecordReader/RecordReader.js"></script>
         
         <script src="assets/libs/dropzone.js"></script>
         <link rel="stylesheet" type="text/css" href="assets/libs/dropzone.css">
@@ -11,15 +14,6 @@
     </head>
 
     <body ng-app="cream">
-       <main>
-    <section>
-        <h1 style="text-align:center;">Send us your data!</h1>
-        <div id="dropzone">
-            <form action="/InputFiles" class="dropzone dz-clickable" id="demo-upload">
-                <div class="dz-message">Drop files here or click to upload.</div>
-            </form>
-        </div>
-    </section>
-</main>
+      <div ng-view></div>
     </body>
-    
+</html>

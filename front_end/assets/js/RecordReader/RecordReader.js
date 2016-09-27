@@ -3,7 +3,7 @@ function RecordReader(InputSplit, Config) {
     var type = Config.type;
     
     //initalize records to null for error detection
-    var records = {};
+    var records = [];
 
     if(type == "TextInputFormat"){
         //key is line number, val is line
@@ -12,7 +12,7 @@ function RecordReader(InputSplit, Config) {
         for(var i = 0; i < arr.length; i++) {
             //check to see if split ended on a new line
             if(arr[i].length > 0)
-                records[i.toString()] = arr[i]; 
+                records.push({key : i, val : arr[i]});
         }
     }
     else if(type == "KeyValueTextInputFormat") {
@@ -25,8 +25,7 @@ function RecordReader(InputSplit, Config) {
                 var r = keysAndVals[row].split(delimitter);
                 var key = r[0];
                 var val = r[1];
-                console.log('key: ' + key + ', val: ' + val);
-                records[key] = val;
+                records.push({key : key, val : val});
             }
         }
     }

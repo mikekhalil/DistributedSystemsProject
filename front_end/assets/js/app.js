@@ -1,4 +1,14 @@
-var app = angular.module('cream',[]);
+var app = angular.module('cream',['ngRoute']);
+
+app.config(function($routeProvider) {
+  $routeProvider
+  .when('/', {
+    templateUrl : 'components/data_upload/data_upload.html',
+    controller  : 'uploadController'
+  })
+
+  .otherwise({redirectTo: '/'});
+});
 
 
 

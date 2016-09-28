@@ -7,6 +7,17 @@
         <script src="assets/js/app.js"></script>
         <script src="components/data_upload/data_upload_controller.js"></script>
         <script src="assets/js/RecordReader/RecordReader.js"></script>
+        <script src="assets/js/Reducer/Reducer.js"></script>
+        <script src="assets/js/Mapper/Mapper.js"></script>
+
+       <script>
+           var input = "But one hundred years later, the Negro still is not free.\n One hundred years later, the life of the Negro is still sadly crippled by the manacles of segregation and the chains of discrimination. "
+           var records = RecordReader(input, {type: "TextInputFormat"});
+           var ShuffledData = Mapper( wordCount );
+           console.log(ShuffledData);
+           var ReducedData = Reducer( ShuffledData, reduceFunc, null );
+           console.log(ReducedData);
+       </script> 
         
         <script src="assets/libs/dropzone.js"></script>
         <link rel="stylesheet" type="text/css" href="assets/libs/dropzone.css">

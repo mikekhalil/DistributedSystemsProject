@@ -1,17 +1,22 @@
 /* test
 var records = [ {"key":"0", "value":"Paul"}, {"key":"1", "value":"Alex"}, {"key":"2", "value":"Paul"}, {"key":"3", "value":"Dave"} ];
+*/
+
 
 function wordCount( key, value ) {
-    var list = new Array();
-    var count = 1;
-    list.push({key : value, value : count});
+    var list = [];
+    var split = value.split(" ");
+	for(var i in split) {
+		var word = split[i];
+		list.push({key : word, value : 1});
+	}
     return list;
 }
-*/
+
 
 function Mapper( mapFunc ) {
     var shuffledList = new Array(); /* shuffled and sorted list	   */
-    var pairs = {};		    /* array returned from mapFunc */
+    var pairs = [];		    /* array returned from mapFunc */
 
     function indexOfVal( str ) {
 	for (var i in shuffledList) {
@@ -40,6 +45,6 @@ function Mapper( mapFunc ) {
 	}
     }
     shuffledList.sort(function(a, b) { return a.key.localeCompare(b.key);});
-    console.log(shuffledList);
+    //console.log(shuffledList);
     return shuffledList;
 }

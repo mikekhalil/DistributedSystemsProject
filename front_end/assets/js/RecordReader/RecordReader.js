@@ -8,7 +8,6 @@ function RecordReader(InputSplit, Config) {
     if(type == "TextInputFormat"){
         //key is line number, val is line
         arr = InputSplit.split("\n");
-        console.log(arr.length);
         for(var i = 0; i < arr.length; i++) {
             //check to see if split ended on a new line
             if(arr[i].length > 0)
@@ -19,7 +18,6 @@ function RecordReader(InputSplit, Config) {
         //keys and vals are specified in file
         var delimitter = Config.delimitter;
         var keysAndVals = InputSplit.split("\n");
-        console.log(keysAndVals);
         for(var row in keysAndVals) {
             if(keysAndVals[row].length > 0){
                 var r = keysAndVals[row].split(delimitter);

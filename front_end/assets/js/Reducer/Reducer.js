@@ -5,6 +5,7 @@ function Reducer(ShuffledData, reduceFunc, Config) {
         var reduction = reduceFunc(record.key, record.value);
         result[record.key] = reduction;
     }
+    return result;
 }
 
 //example output from shuffler 
@@ -18,18 +19,11 @@ var input = [
 function reduceFunc(key, val) {
     //word count example
     var count = 0;
-
     for(var index in val) {
-        console.log('val[[index]] = ' + val[index]);
         count += val[index];
     }
-    console.log('count ' + count);
     return count;
 }
-
-
-Reducer(input, reduceFunc, null);
-
 
 
 

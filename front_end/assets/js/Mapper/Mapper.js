@@ -1,23 +1,15 @@
-/* test
-var records = [ {"key":"0", "value":"Paul"}, {"key":"1", "value":"Alex"}, {"key":"2", "value":"Paul"}, {"key":"3", "value":"Dave"} ];
-*/
+/* Calls the mapper function on each record and the mapFunc returns a key,value pair(s).
+ * Shuffles and sorts the key, value pairs
+ * List returned is a JSON array in the format
+ * [ {key:"key1", value:["val1", "val2", ...]}, {key:"key2", value:["val1"]}]
+ * Written by Paul Heldring
+ */
 
-
-function wordCount( key, value ) {
-    var list = [];
-    var split = value.split(" ");
-	for(var i in split) {
-		var word = split[i];
-		list.push({key : word, value : 1});
-	}
-    return list;
-}
-
-
-function Mapper( mapFunc ) {
+function Mapper( mapFunc, records ) {
     var shuffledList = new Array(); /* shuffled and sorted list	   */
     var pairs = [];		    /* array returned from mapFunc */
 
+    // returns the index of key or -1 if key does not exist
     function indexOfVal( str ) {
 	for (var i in shuffledList) {
 	    if (shuffledList[i].key === str) {
@@ -44,7 +36,6 @@ function Mapper( mapFunc ) {
 	    }
 	}
     }
-    shuffledList.sort(function(a, b) { return a.key.localeCompare(b.key);});
-    //console.log(shuffledList);
+    shuffledList.sort(function(a, b) { return a.key.localeCompare(b.key); });
     return shuffledList;
 }

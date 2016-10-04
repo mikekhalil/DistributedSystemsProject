@@ -38,12 +38,12 @@ module.exports = function (socket, channelname){
 
 	/*route outgoing messages to socket.io server*/ 
 	module.outchannel.subscribe("outgoing", function (data) {
-		socket.emit(type, data); 
+		socket.emit(data.reciever, data); 
     });
 		
 	/*recieve incoming messages and re-establish original topic*/ 
     module.inchannel.subscribe("incoming", function (data) {
-    	module.inchannel.publish(topic, data); 
+    	module.inchannel.publish(data.topic, data); 
     }); 
 
     /*publish array of sockids as recipients*/ 
@@ -108,7 +108,7 @@ module.exports = function (socket, channelname){
 	return module;
 };
 
-/*Wrap msg to send*/
+/*wrap msg for sending*/ 
 function wrapData(sender, reciever ,topic, sockid, data) {
 	var newdata = {}; 
 	newdata.sender = sender; 

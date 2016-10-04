@@ -4,9 +4,10 @@
 */
 
 var postal = require("postal");
+var _  = require("lodash"); 
 
 /*
-Module.ClientTab is a table of connected clients 
+Module.ClientTab is a table of connected clients (connected to the inflection server)
 Module.ClientTab[n] =  
 {
 	sockid: socket id, 
@@ -14,7 +15,7 @@ Module.ClientTab[n] =
 	role: worker, manager, reducer
 }
 
-Outgoing messages are wrapped in a struct 
+Outgoing and incoming messages are wrapped in a struct 
 MessageWrapper = {
 	data: original message, 
 	sender:  (string), 
@@ -24,88 +25,70 @@ MessageWrapper = {
 } 
 
 channelname can be anything. However the inflection server route messages
-for  'manager', 'reducer' , 'worker'. 
+for  'manager', 'reducer' , 'worker' and 'server'. 
 */ 
-
-var testcounter =0; 
 
 module.exports = function (socket, channelname){
 	var module = {}; 
 	/*Client Tab house*/
 	module.ClientTab = []; 
 
-	module.channel = postal.channel(channelname); 
-	module.isReady = false; 
-	//forward outgoing packets
+	module.inchannel = postal.channel("in" + channelname); 
+	module.outchannel  = postal.channel("out" + channelname); 
 
-	module.channel.subscribe("outgoing", function (data) {
-		console.log("consumed from channel"); 
+
+
+	module.outchannel.subscribe("outgoing", function (data) {
 		forwardToSocket(data,socket, data.reciever);  
     });
 		
-	/*subsrictions should be in manager, reducer, client code with appropriate handlers */ 
-    module.channel.subscribe("incoming", function (data) {
-    	var sender = data.sender; 
-    	var reciever = data.reciever; 
-    	var topic = data.topic; 
-    	var id =  data.id;
-    	data = data.data;
-    	
-    	module.channel.publish(topic, data); 
+    module.inchannel.subscribe("incoming", function (data) {
+    	module.inchannel.publish(topic, data); 
     }); 
 
     module.publishToSelectedWorkers = function (recipient, topic,data) {
 		
 		data = wrapData(channelname, "worker" ,topic, recipient, data); 
-		module.channel.publish( "outgoing", data);
+		module.outchannel.publish( "outgoing", data);
 	}
-
 	module.publishToStatusWorkers = function (status, topic, data) {
 		if (status!='idle' && status!='active') {
 			console.log("Incompatible Status. Options: idle, active");
 		}
 		var recip = []; 
-		for (var i=0; i<module.clientTab.length; i++) {
-			if(module.clientTab.status==status) {
+		for (var i in module.clientTab) {
+			if(module.clientTab[i].status==status && module.clientTab.role =="worker") {
 				recip.push(module.clientTab.sockid); 
 			}
 		}
 		data = wrapData(channelname, "worker", topic, recip, data); 
-		module.channel.publish( "outgoing", data); 
+		module.outchannel.publish( "outgoing", data); 
 	}
-	module.publishToReducer = function (topic, data) {
-		data = wrapData(channelname, "reducer", topic, null, data); 
-		console.log("publising to channel"); 
-		module.channel.publish('outgoing', data);
-	} 
-	module.publishToManager = function (topic, data) {
-		data = wrapData(channelname, "manager", topic, null, data);  
-		module.channel.publish('outgoing', data); 
-	} 
-
-	module.getIdleWorkers = function () {
-		var idle = []; 
-		for (var i=0; i < module.ClientTab.length; i++) {
-			if(module.ClientTab[i].status == "idle" && module.ClientTab[i].role =="worker") 
-				idle.push(module.ClientTab[i].sockid); 
+	module.publishTo = function (recipient, topic, data) {
+		recipient = _.toLower(recipient); 
+		var options = ['worker', 'reducer', 'manager', 'server']; 
+		var intersect = _.intersection(options, [recipient]);
+		if (intersect.length!=1) {
+			console.log('ERROR: invalid recipient'); 
+			return; 
 		}
-		return idle; 
-	} 
+		data = wrapData(channelname, recipient, topic, null, data); 
+	}
 	module.printConnections = function () {
 		console.log("Inflection Server connected to ...")
-		for (var i=0; i<module.ClientTab.length; i++) {
-			console.log(module.ClientTab[x].role +" at sockId " + module.ClientTab.sockid); 
+		for (var i in module.ClientTab) {
+			console.log(module.ClientTab[i].role +" at sockId " + module.ClientTab[i].sockid); 
 		}
 	}
 	
 	/*recieve incoming messages*/ 
 	socket.on(channelname, function(msg){	
 		console.log("incoming messages"); 	
-		module.channel.publish("incoming", msg); 
+		module.inchannel.publish("incoming", msg); 
 	}); 
 
 	/*register self*/
-	var msg= {}; 
+	var msg= {};  
 	msg = wrapData(channelname, "", "", "", msg); 
 	socket.emit('register', msg); 
 		 
@@ -115,10 +98,6 @@ module.exports = function (socket, channelname){
 	socket.on('clientTabUpdate' , function(msg) {
 		module.ClientTab = msg; 
 		console.log("recieved clientTab"); 
-		if(!module.isReady) {
-			module.isReady=true; 
-			//module.activateOutgoingTraffic(); 
-		}
 	}); 
 
 	return module;

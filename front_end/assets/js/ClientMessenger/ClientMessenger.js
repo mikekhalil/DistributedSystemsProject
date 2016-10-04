@@ -25,8 +25,8 @@ socket.on('relay', function(msg){
 }); 
 
 function RegisterWithSocket() { 
-	//var msg = {}; 
-	//msg.level = "worker"; 
+	var msg = {}; 
+	msg.level = "worker"; 
 	socket.emit('register', msg); 
 }
 

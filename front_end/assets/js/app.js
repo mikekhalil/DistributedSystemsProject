@@ -1,4 +1,4 @@
-var app = angular.module('cream',['ngRoute']);
+var app = angular.module('cream',['ngRoute','ngFileUpload']);
 
 app.config(function($routeProvider) {
   $routeProvider

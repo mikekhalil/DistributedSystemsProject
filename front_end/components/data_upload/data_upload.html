@@ -1,10 +1,67 @@
- <main>
-    <section>
-        <h1 style="text-align:center;">Send us your data!</h1>
-        <div id="dropzone">
-            <form action="/InputFiles" class="dropzone dz-clickable" id="demo-upload">
-                <div class="dz-message">Drop files here or click to upload.</div>
-            </form>
-        </div>
-    </section>
-</main>
+<style>
+    .button {
+    -moz-appearance: button;
+    /* Firefox */
+    -webkit-appearance: button;
+    /* Safari and Chrome */
+    padding: 10px;
+    margin: 10px;
+    width: 70px;
+}
+.drop-box {
+    background: #F8F8F8;
+    border: 5px dashed #DDD;
+    width: 200px;
+    height: 65px;
+    text-align: center;
+    padding-top: 25px;
+    margin: 10px;
+}
+.dragover {
+    border: 5px dashed blue;
+}
+</style>
+<div>
+    <!--watching model:
+    <div class="button" ngf-select ng-model="file" ngf-multiple="false">Select File</div>
+    Files:
+    <ul>
+        <li ng-repeat="f in files" style="font:smaller">{{f.name}} {{f.$error}} {{f.$errorParam}}</li>
+    </ul>
+    Upload Log:-->
+   
+
+    <div class="row"> 
+        <div class="col s4">
+            <div ngf-drop ngf-select ng-model="dataFile" class="drop-box" 
+                ngf-drag-over-class="'dragover'" ngf-multiple="false" 
+                ngf-allow-dir="false">
+                
+                Data File
+            </div>
+            <pre>{{dataLog}}</pre>
+        </div> 
+         <div class="col s4">
+            <div ngf-drop ngf-select ng-model="mapFile" class="drop-box" 
+                ngf-drag-over-class="'dragover'" ngf-multiple="false" 
+                ngf-allow-dir="false">
+                
+                Map File
+            </div>
+            <pre>{{mapLog}}</pre>
+        </div> 
+         <div class="col s4">
+            <div ngf-drop ngf-select ng-model="reduceFile" class="drop-box" 
+                ngf-drag-over-class="'dragover'" ngf-multiple="false" 
+                ngf-allow-dir="false">
+                
+                Reduce File
+            </div>
+            <pre>{{reduceLog}}</pre>
+        </div> 
+    </div>
+
+
+
+
+</div>

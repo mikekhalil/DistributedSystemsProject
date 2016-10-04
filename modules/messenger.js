@@ -30,30 +30,33 @@ for  'manager', 'reducer' , 'worker' and 'server'.
 
 module.exports = function (socket, channelname){
 	var module = {}; 
-	/*Client Tab house*/
 	module.ClientTab = []; 
 
+	/*channels for incoming and outgoing traffic*/
 	module.inchannel = postal.channel("in" + channelname); 
 	module.outchannel  = postal.channel("out" + channelname); 
 
-
-
+	/*route outgoing messages to socket.io server*/ 
 	module.outchannel.subscribe("outgoing", function (data) {
-		forwardToSocket(data,socket, data.reciever);  
+		socket.emit(type, data); 
     });
 		
+	/*recieve incoming messages and re-establish original topic*/ 
     module.inchannel.subscribe("incoming", function (data) {
     	module.inchannel.publish(topic, data); 
     }); 
 
+    /*publish array of sockids as recipients*/ 
     module.publishToSelectedWorkers = function (recipient, topic,data) {
 		
 		data = wrapData(channelname, "worker" ,topic, recipient, data); 
 		module.outchannel.publish( "outgoing", data);
 	}
+
+	/*publish to workers with selected status*/
 	module.publishToStatusWorkers = function (status, topic, data) {
 		if (status!='idle' && status!='active') {
-			console.log("Incompatible Status. Options: idle, active");
+			console.log("ERROR: Invalid Status. Options: idle, active");
 		}
 		var recip = []; 
 		for (var i in module.clientTab) {
@@ -64,16 +67,20 @@ module.exports = function (socket, channelname){
 		data = wrapData(channelname, "worker", topic, recip, data); 
 		module.outchannel.publish( "outgoing", data); 
 	}
+	/*General publish call. When worker is selected, all connected workers will get msg.*/ 
 	module.publishTo = function (recipient, topic, data) {
 		recipient = _.toLower(recipient); 
 		var options = ['worker', 'reducer', 'manager', 'server']; 
 		var intersect = _.intersection(options, [recipient]);
 		if (intersect.length!=1) {
-			console.log('ERROR: invalid recipient'); 
+			console.log('ERROR: Invalid recipient'); 
 			return; 
 		}
 		data = wrapData(channelname, recipient, topic, null, data); 
+		module.outchannel.publish("outgoing", data); 
 	}
+
+	/*print clientTab*/ 
 	module.printConnections = function () {
 		console.log("Inflection Server connected to ...")
 		for (var i in module.ClientTab) {
@@ -83,7 +90,6 @@ module.exports = function (socket, channelname){
 	
 	/*recieve incoming messages*/ 
 	socket.on(channelname, function(msg){	
-		console.log("incoming messages"); 	
 		module.inchannel.publish("incoming", msg); 
 	}); 
 
@@ -97,16 +103,12 @@ module.exports = function (socket, channelname){
 	*/ 
 	socket.on('clientTabUpdate' , function(msg) {
 		module.ClientTab = msg; 
-		console.log("recieved clientTab"); 
 	}); 
 
 	return module;
 };
 
-function forwardToSocket(data, socket, type) {
-	socket.emit(type, data); 
-}
-
+/*Wrap msg to send*/
 function wrapData(sender, reciever ,topic, sockid, data) {
 	var newdata = {}; 
 	newdata.sender = sender; 

@@ -8,6 +8,7 @@ const path = require('path');
 var http = require('http');
 var server = http.createServer(app);  
 var io = require('socket.io').listen(server);
+var postal = require('postal');
 
 
 app.use(express.static(__dirname + '/front_end'));
@@ -78,9 +79,21 @@ io.on('connection', function(socket) {
 				ClientTab.splice(x,1); 
 			}
 		}
-		console.log('disconnect'); 
+		console.log('A client disconnected'); 
 		console.log(ClientTab); 
 		io.emit('clientTabUpdate' , ClientTab);
+	}); 
+	socket.on('server', function (msg){
+		if (msg.topic=="StartedMapReduce") {
+			for (var i in ClientTab) {
+				if (ClientTab[i].sockid == socket.id)  {
+					ClientTab[i].status = "active"; 
+					break; 
+				}
+			}
+		io.emit('clientTabUpdate' , ClientTab);	
+		}
+
 	}); 
 }); 
 

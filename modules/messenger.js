@@ -41,20 +41,17 @@ module.exports = function (socket, channelname){
 		console.log("outgoing"); 
 		socket.emit(data.reciever, data); 
     });
-		
 	/*recieve incoming messages and re-establish original topic*/ 
     module.inchannel.subscribe("incoming", function (data) {
     	console.log("incoming"); 
     	module.inchannel.publish(data.topic, data); 
     }); 
-
     /*publish array of sockids as recipients*/ 
     module.publishToSelectedWorkers = function (recipient, topic,data) {
 		
 		data = wrapData(channelname, "worker" ,topic, recipient, data); 
 		module.outchannel.publish( "outgoing", data);
 	}
-
 	/*publish to workers with selected status*/
 	module.publishToStatusWorkers = function (status, topic, data) {
 		if (status!='idle' && status!='active') {
@@ -134,6 +131,5 @@ function wrapData(sender, reciever ,topic, sockid, data) {
 /*CHANGE/ISSUE LOG 
 * 1) Need some mechanism to ensure clientTab has been recieved before outgoing 
 * is enabled. Otherwise initial outgoing traffic may be lost. 
-* 2) Handle disconnect. 
 */
 

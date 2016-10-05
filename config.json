@@ -7,5 +7,12 @@
     "components" : ["worker", "reducer", "manager", "server"],
     "REDUCE" : "reduce",
     "MAP" : "map",
-    "DATA" : "data"
+    "DATA" : "data",
+    "mongodb" : {
+        "url" : "mongodb://192.241.230.18:27017/cream"
+    },
+    "topics" : {
+        "SYSTEM_RESET" : "SystemReset",
+        "RESULTS" : "Results"
+    }
 }

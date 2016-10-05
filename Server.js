@@ -47,9 +47,6 @@ app.post('/InputFiles', function (req, res) {
 		}
 		else {
 			//just send path to data file
-			console.log("AYYY");
-			console.log(path.join(dir,req.file.filename));
-			console.log("AYYY");
 			var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
 			io.emit('UploadedFile', payload);
 		}

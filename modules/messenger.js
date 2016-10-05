@@ -5,7 +5,7 @@
 
 var postal = require("postal");
 var _  = require("lodash"); 
-var config = require('./config.json');
+var config = require(__dirname + '/../config.json');
 
 /*
 Module.ClientTab is a table of connected clients (connected to the inflection server)

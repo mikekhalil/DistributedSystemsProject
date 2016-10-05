@@ -3,5 +3,8 @@
         "path" : "InputFiles/",
         "data" : "dataFile",
         "type" : "typeOfInput"
-    }
+    },
+    "REDUCE" : "reduce",
+    "MAP" : "map",
+    "DATA" : "data"
 }

@@ -81,7 +81,15 @@ module.exports = function (socket, channelname){
 		data = wrapData(channelname, recipient, topic, null, data); 
 		module.outchannel.publish("outgoing", data); 
 	}
-
+	/*Returns Array of Idle workers*/
+	module.getIdleWorkers = function () {
+		var idle = []; 
+		for (var i in module.ClientTab) {
+			if (module.ClientTab[i].role=="worker" && module.ClientTab[i].status=="idle")
+				idle.push(module.ClientTab[i].sockid); 
+		}
+		return idle; 
+	}
 	/*print clientTab*/ 
 	module.printConnections = function () {
 		console.log("Inflection Server connected to ...")
@@ -96,9 +104,11 @@ module.exports = function (socket, channelname){
 	}); 
 
 	/*register self*/
-	var msg= {};  
-	msg = wrapData(channelname, "", "", "", msg); 
-	socket.emit('register', msg); 
+	socket.on('connect', function() {
+		var msg= {};  
+		msg = wrapData(channelname, "", "", "", msg); 
+		socket.emit('register', msg); 
+	}); 
 		 
 	/*recieve update client tab from socketserver 
 	ISSUE: error checking is dog shit

@@ -69,9 +69,11 @@ socket.on(channelname, function(msg){
 	}); 
 
 /*register self*/
-var msg= {};  
-msg = wrapData(channelname, "", "", "", msg); 
-socket.emit('register', msg); 
+socket.on('connect', function() {
+	var msg= {};  
+	msg = wrapData(channelname, "", "", "", msg); 
+	socket.emit('register', msg); 
+}); 
 	 
 /*recieve update client tab from socketserver 
 ISSUE: error checking is dog shit

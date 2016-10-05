@@ -72,6 +72,16 @@ io.on('connection', function(socket) {
 			io.emit('worker', msg); 
 		}
 	});
+	socket.on('disconnect' , function (){
+		for (x in ClientTab) {
+			if (ClientTab[x].sockid == socket.id) {
+				ClientTab.splice(x,1); 
+			}
+		}
+		console.log('disconnect'); 
+		console.log(ClientTab); 
+		io.emit('clientTabUpdate' , ClientTab);
+	}); 
 }); 
 
 function registerClient(socket, msg) {

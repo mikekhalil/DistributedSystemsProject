@@ -18,7 +18,7 @@ var isInitialized = function() {
     return false;
 }
 
-socket.on('UploadedFiles', function(file) {
+socket.on('UploadedFile', function(file) {
     if( file.type === config.REDUCE || file.type === config.MAP ){
         setup[file.type] = new Function(file.data);
     }
@@ -40,3 +40,8 @@ socket.on('UploadedFiles', function(file) {
         console.log(setup);
     }
 });
+
+messenger.inchannel.subscribe("SystemReset" , function(msg) {
+	ResourceTable = []; 
+	setup = {map : null, reduce : null, data : null }; 
+}); 

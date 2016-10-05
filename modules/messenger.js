@@ -5,6 +5,7 @@
 
 var postal = require("postal");
 var _  = require("lodash"); 
+var config = require('./config.json');
 
 /*
 Module.ClientTab is a table of connected clients (connected to the inflection server)
@@ -69,14 +70,19 @@ module.exports = function (socket, channelname){
 	/*General publish call. When worker is selected, all connected workers will get msg.*/ 
 	module.publishTo = function (recipient, topic, data) {
 		recipient = _.toLower(recipient); 
-		var options = ['worker', 'reducer', 'manager', 'server']; 
-		var intersect = _.intersection(options, [recipient]);
+		var intersect = _.intersection(config.components, [recipient]);
 		if (intersect.length!=1) {
 			console.log('ERROR: Invalid recipient'); 
 			return; 
 		}
 		data = wrapData(channelname, recipient, topic, null, data); 
 		module.outchannel.publish("outgoing", data); 
+	}
+	module.publishToAll = function (topic, data) {
+		for (var i in config.components) {
+			data = wrapData(channelname, config.components[i], topic, null, data); 
+			module.outchannel.publish("outgoing", data); 
+		}
 	}
 	/*Returns Array of Idle workers*/
 	module.getIdleWorkers = function () {

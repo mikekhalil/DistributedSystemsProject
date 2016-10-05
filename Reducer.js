@@ -5,3 +5,7 @@ socket.on('connect', function() {
 
 	console.log("cream!"); 	
 }); 
+
+messenger.inchannel.subscribe("SystemReset" , function(msg) {
+	//do stuff to reset reducer
+}); 

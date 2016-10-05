@@ -1,4 +1,4 @@
-//require stuff
+/*requires*/
 var express = require('express');
 var app = express();
 var fileUpload = require(__dirname + '/modules/FileUpload.js');
@@ -10,6 +10,8 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var postal = require('postal');
 
+/*globals*/
+var ClientTab = []; 
 
 app.use(express.static(__dirname + '/front_end'));
 
@@ -41,7 +43,7 @@ app.post('/InputFiles', function (req, res) {
 			//read in function as string
 			var file = fs.readFileSync(path.join(dir,req.file.filename), "utf8");
 			var payload  = {type : req.body.type, data : file};
-			io.emit('UploadedFiles', payload);
+			io.emit('UploadedFile', payload);
 		}
 		else {
 			//just send path to data file
@@ -49,12 +51,11 @@ app.post('/InputFiles', function (req, res) {
 			console.log(path.join(dir,req.file.filename));
 			console.log("AYYY");
 			var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
-			io.emit('UploadedFiles', payload);
+			io.emit('UploadedFile', payload);
 		}
     })
 });
 
-var ClientTab = []; 
 
 io.on('connection', function(socket) {
 	
@@ -102,11 +103,19 @@ io.on('connection', function(socket) {
 			}
 			io.emit('clientTabUpdate' , ClientTab);	
 		}
-		if (msg.topic=="CompletedMapReduce") {
+		else if (msg.topic=="CompletedMapReduce") {
 			for (var i in ClientTab) {
 				if (ClientTab[i].sockid == socket.id)  {
 					ClientTab[i].status = "idle"; 
 					break; 
+				}
+			}
+			io.emit('clientTabUpdate' , ClientTab);	
+		}
+		else if (msg.topic=="SystemReset") {
+			for (var i in ClientTab) {
+				if (ClientTab[i].status == "active")  {
+					ClientTab[i].status = "idle"; 
 				}
 			}
 			io.emit('clientTabUpdate' , ClientTab);	

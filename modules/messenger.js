@@ -38,11 +38,13 @@ module.exports = function (socket, channelname){
 
 	/*route outgoing messages to socket.io server*/ 
 	module.outchannel.subscribe("outgoing", function (data) {
+		console.log("outgoing"); 
 		socket.emit(data.reciever, data); 
     });
 		
 	/*recieve incoming messages and re-establish original topic*/ 
     module.inchannel.subscribe("incoming", function (data) {
+    	console.log("incoming"); 
     	module.inchannel.publish(data.topic, data); 
     }); 
 
@@ -60,8 +62,8 @@ module.exports = function (socket, channelname){
 		}
 		var recip = []; 
 		for (var i in module.clientTab) {
-			if(module.clientTab[i].status==status && module.clientTab.role =="worker") {
-				recip.push(module.clientTab.sockid); 
+			if(module.clientTab[i].status==status && module.clientTab[i].role =="worker") {
+				recip.push(module[i].clientTab.sockid); 
 			}
 		}
 		data = wrapData(channelname, "worker", topic, recip, data); 
@@ -122,6 +124,6 @@ function wrapData(sender, reciever ,topic, sockid, data) {
 /*CHANGE/ISSUE LOG 
 * 1) Need some mechanism to ensure clientTab has been recieved before outgoing 
 * is enabled. Otherwise initial outgoing traffic may be lost. 
-*
+* 2) Handle disconnect. 
 */
 

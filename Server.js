@@ -37,10 +37,20 @@ app.post('/InputFiles', function (req, res) {
         }
         fs.renameSync(req.file.path,path.join(dir, req.file.filename));
 
-		
-		var file = fs.readFileSync(path.join(dir,req.file.filename), "utf8");
-		var payload  = {type : req.body.type, data : file};
-		io.emit('initialize', payload);
+		if(req.body.type === config.REDUCE || req.body.type === config.MAP) {
+			//read in function as string
+			var file = fs.readFileSync(path.join(dir,req.file.filename), "utf8");
+			var payload  = {type : req.body.type, data : file};
+			io.emit('initialize', payload);
+		}
+		else {
+			//just send path to data file
+			console.log("AYYY");
+			console.log(path.join(dir,req.file.filename));
+			console.log("AYYY");
+			var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
+			io.emit('initialize', payload);
+		}
     })
 });
 

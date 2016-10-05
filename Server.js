@@ -91,7 +91,16 @@ io.on('connection', function(socket) {
 					break; 
 				}
 			}
-		io.emit('clientTabUpdate' , ClientTab);	
+			io.emit('clientTabUpdate' , ClientTab);	
+		}
+		if (msg.topic=="CompletedMapReduce") {
+			for (var i in ClientTab) {
+				if (ClientTab[i].sockid == socket.id)  {
+					ClientTab[i].status = "idle"; 
+					break; 
+				}
+			}
+			io.emit('clientTabUpdate' , ClientTab);	
 		}
 
 	}); 

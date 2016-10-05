@@ -86,7 +86,7 @@ socket.on('clientTabUpdate' , function(msg) {
 /*wrap msg for sending*/ 
 function wrapData(sender, reciever ,topic, sockid, data) {
 	var newdata = {}; 
-	newdata.sender = sender; 
+	newdata.sender = socket.id; 
 	newdata.reciever = reciever; 
 	newdata.topic = topic; 
 	newdata.id = sockid; 

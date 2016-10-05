@@ -25,8 +25,8 @@ socket.on('connect', function() {
 				"00000000000"+
 				"00000000000";
 
-
-		messenger.publishTo("reducer", "Testing", data); 
+		for (var i=0; i<10000; i++) 
+			messenger.publishTo("worker", "Testing", data); 
 
 	
 	console.log("done"); 

@@ -41,7 +41,7 @@ app.post('/InputFiles', function (req, res) {
 			//read in function as string
 			var file = fs.readFileSync(path.join(dir,req.file.filename), "utf8");
 			var payload  = {type : req.body.type, data : file};
-			io.emit('initialize', payload);
+			io.emit('UploadedFiles', payload);
 		}
 		else {
 			//just send path to data file
@@ -49,7 +49,7 @@ app.post('/InputFiles', function (req, res) {
 			console.log(path.join(dir,req.file.filename));
 			console.log("AYYY");
 			var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
-			io.emit('initialize', payload);
+			io.emit('UploadedFiles', payload);
 		}
     })
 });
@@ -61,7 +61,6 @@ io.on('connection', function(socket) {
 	console.log('a client connected');
 	io.emit('clientTabUpdate' , ClientTab); 
 
-	//disconnect update clientTab
 	socket.on('register', function (msg) {
 		registerClient(socket, msg); 
 	}); 

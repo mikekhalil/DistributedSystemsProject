@@ -18,7 +18,7 @@ var isInitialized = function() {
     return false;
 }
 
-socket.on('initialize', function(file) {
+socket.on('UploadedFiles', function(file) {
     if( file.type === config.REDUCE || file.type === config.MAP ){
         setup[file.type] = new Function(file.data);
     }

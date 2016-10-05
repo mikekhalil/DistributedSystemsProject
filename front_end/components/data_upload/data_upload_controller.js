@@ -45,7 +45,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout', function($scop
               var file = files[i];
               if (!file.$error) {
                 Upload.upload({
-                    url: 'http://localhost:3000/InputFiles/',
+                    url: 'http://localhost:8080/InputFiles/',
                     data: {
                       file: file,
                       type : type 

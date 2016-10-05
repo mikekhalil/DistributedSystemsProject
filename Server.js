@@ -9,15 +9,19 @@ var http = require('http');
 var server = http.createServer(app);  
 var io = require('socket.io').listen(server);
 
+
 app.use(express.static(__dirname + '/front_end'));
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/front_end/index.html');
 });
 
+
+server.listen(8080); 
+
+
 app.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){
-        
         //send response to client
         if(err){
                 res.json({error_code:1,err_desc:err});
@@ -31,6 +35,11 @@ app.post('/InputFiles', function (req, res) {
              fs.mkdirSync(dir);
         }
         fs.renameSync(req.file.path,path.join(dir, req.file.filename));
+
+		
+		var file = fs.readFileSync(path.join(dir,req.file.filename), "utf8");
+		var payload  = {type : req.body.type, data : file};
+		io.emit('initialize', payload);
     })
 });
 
@@ -76,5 +85,3 @@ function registerClient(socket, msg) {
 }
 
 
-
-server.listen(8080); 

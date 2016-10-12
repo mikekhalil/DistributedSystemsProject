@@ -11,7 +11,7 @@ var func = function SplitInput( file , splitDir) {
     var j = 0;			/* count num chars in split	*/
     var split = '';		/* split string			*/
     var splits = {};		/* store file path of splits	*/
-    var splitSize = 64000000;  	/* split size in bytes		*/
+    var splitSize = 25;  	/* split size in bytes		*/
     var splitCount = 0;		/* number of splits		*/
     var filepath = '';		/* full path of split		*/
 
@@ -26,7 +26,7 @@ var func = function SplitInput( file , splitDir) {
 	for (var i = 0; i < data.length; i++) {
 	    // Reached max split size or end of file 
 	    if ( j == (splitSize-1) || i == (data.length-1) ) {
-		while ( data[i] != '\n' ) {
+		while ( data[i] != '\n' && i < data.length) {
 		    split += data[i++];
 		    j++;
 		}

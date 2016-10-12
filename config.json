@@ -13,6 +13,12 @@
     },
     "topics" : {
         "SYSTEM_RESET" : "SystemReset",
-        "RESULTS" : "Results"
+        "RESULTS" : "Results",
+        "STARTED_MAP_REDUCE" : "StartedMapReduce",
+        "COMPLETED_MAP_REDUCE" : "CompletedMapReduce",
+        "CLIENT_TABLE_UPDATE" : "clientTabUpdate"
+    },
+    "status" : {
+        "INCOMPLETE" : "incomplete"
     }
 }

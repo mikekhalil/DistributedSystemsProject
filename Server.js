@@ -22,7 +22,6 @@ app.get('/', function (req, res) {
 
 server.listen(8080); 
 
-
 app.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){
         //send response to client
@@ -39,17 +38,10 @@ app.post('/InputFiles', function (req, res) {
         }
         fs.renameSync(req.file.path,path.join(dir, req.file.filename));
 
-		if(req.body.type === config.REDUCE || req.body.type === config.MAP) {
-			//read in function as string
-			var file = fs.readFileSync(path.join(dir,req.file.filename), "utf8");
-			var payload  = {type : req.body.type, data : file};
-			io.emit('UploadedFile', payload);
-		}
-		else {
-			//just send path to data file
-			var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
-			io.emit('UploadedFile', payload);
-		}
+		//just send path to data file
+		var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
+		io.emit('UploadedFile', payload);
+		
     })
 });
 

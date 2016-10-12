@@ -4,44 +4,47 @@ var fs = require('fs');
 var config = require('./config.json');
 var splitter = require(__dirname + '/modules/SplitInput.js');
 const path = require('path');
+const resourceManager = require(__dirname + '/modules/ClientManager.js');
+const JobFactory = require(__dirname + '/modules/JobFactory.js');
 
-//resource table with have rows of Resource Objects
-//Resource Object : { inputSplit (string) , processed (boolean), worker (socketid), active (boolean)}
-var ResourceTable = [];
+
+//Job Object : { inputSplit (primary key - string - path), status (string), worker (socketid - foreign key)}
+var jobTable = [];
 var setup = {map : null, reduce : null, data : null }
 
-//check to see if the system is fully initialized
-var isInitialized = function() {
-    if(setup.map && setup.reduce && setup.data)
-        return true;
-    
-    return false;
-}
+//use client table and job table to assign jobs based off availability
 
 socket.on('UploadedFile', function(file) {
     if( file.type === config.REDUCE || file.type === config.MAP ){
-        setup[file.type] = new Function(file.data);
+        var fileData = fs.readFileSync(file.data, "utf8");
+        setup[file.type] = new Function(fileData);
     }
     else {
         //Data file, Create Input Splits
-        setup[file.type] = file.data;
-
-        console.log(file.data);
-
         var dir = path.join(__dirname,config.multer.path,'splits');
 
         //create directory for splits 
         var inputSplits = splitter.splitInput(file.data,dir);
-        console.log(inputSplits);
+        setup[file.type] = inputSplits;
     }
 
-    if(isInitialized()) {
-        //let everyone know that we are good to go 
+    if(resourceManager.isInitialized(setup)) {
+        //set up job table
+        Object.keys(setup.data).forEach(function(key) {
+             jobTable.push(JobFactory.createJob(setup.data[key], config.status.INCOMPLETE));
+        });
         console.log(setup);
+        console.log(jobTable);
+
     }
 });
 
 messenger.inchannel.subscribe("SystemReset" , function(msg) {
-	ResourceTable = []; 
+	jobTable = []; 
 	setup = {map : null, reduce : null, data : null }; 
 }); 
+
+console.log(config.topics.CLIENT_TABLE_UPDATE);
+messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {
+    console.log(msg);
+})

@@ -11,7 +11,7 @@ var func = function SplitInput( file , splitDir) {
     var j = 0;			/* count num chars in split	*/
     var split = '';		/* split string			*/
     var splits = {};		/* store file path of splits	*/
-    var splitSize = 25;  	/* split size in bytes		*/
+    var splitSize = 500;  	/* split size in bytes		*/
     var splitCount = 0;		/* number of splits		*/
     var filepath = '';		/* full path of split		*/
 

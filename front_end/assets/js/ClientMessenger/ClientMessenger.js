@@ -64,9 +64,7 @@ socket.on(channelname, function(msg){
 		messenger.inchannel.publish("incoming", msg); 
 }); 
 
-socket.on(channelname, function(msg){	
-		messenger.inchannel.publish("incoming", msg); 
-	}); 
+
 
 /*register self*/
 socket.on('connect', function() {
@@ -86,7 +84,7 @@ socket.on('clientTabUpdate' , function(msg) {
 /*wrap msg for sending*/ 
 function wrapData(sender, reciever ,topic, sockid, data) {
 	var newdata = {}; 
-	newdata.sender = socket.id; 
+	newdata.sender = sender; 
 	newdata.reciever = reciever; 
 	newdata.topic = topic; 
 	newdata.id = sockid; 

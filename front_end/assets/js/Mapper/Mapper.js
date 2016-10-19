@@ -6,7 +6,7 @@
  */
 
 function Mapper( mapFunc, records ) {
-    var shuffledList = new Array(); /* shuffled and sorted list	   */
+	var shuffledList = new Array(); /* shuffled and sorted list	   */
     var pairs = [];		    /* array returned from mapFunc */
 
     // returns the index of key or -1 if key does not exist

@@ -61,14 +61,18 @@ io.on('connection', function(socket) {
 		io.emit('reducer' , msg); 
 	}); 
 	socket.on('worker', function (msg) {
-		var recip = msg.id; 
-		if (recip !=null ) {
+		console.log(msg);
+		var recip = msg.id;
+		console.log('recipients\n=-=-=-=\n'); 
+		console.log(recip);
+		if (recip != null ) {
 			for (x in recip) {
-				console.log("relay to " + data.id[x]); 
-				io.to(data.id[x]).emit("relay", data);	
+				console.log("relay to " + msg.id[x]); 
+				io.to(msg.id[x]).emit("worker", msg);	
 			}
 		}
 		else {
+			console.log("CREAM");
 			io.emit('worker', msg); 
 		}
 	});

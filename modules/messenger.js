@@ -93,6 +93,8 @@ module.exports = function (socket, channelname){
 		}
 		return idle; 
 	}
+
+
 	/*print clientTab*/ 
 	module.printConnections = function () {
 		console.log("Inflection Server connected to ...")

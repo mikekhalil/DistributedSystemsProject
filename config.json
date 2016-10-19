@@ -19,6 +19,9 @@
         "CLIENT_TABLE_UPDATE" : "clientTabUpdate"
     },
     "status" : {
-        "INCOMPLETE" : "incomplete"
+        "INCOMPLETE" : "incomplete",
+        "IDLE" : "idle",
+        "ACTIVE" : "active",
+        "COMPLETE" : "complete"
     }
 }

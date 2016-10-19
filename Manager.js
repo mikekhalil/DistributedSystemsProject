@@ -17,7 +17,8 @@ var setup = {map : null, reduce : null, data : null }
 socket.on('UploadedFile', function(file) {
     if( file.type === config.REDUCE || file.type === config.MAP ){
         var fileData = fs.readFileSync(file.data, "utf8");
-        setup[file.type] = new Function(fileData);
+        //setup[file.type] = new Function(fileData);
+        setup[file.type] = fileData;
     }
     else {
         //Data file, Create Input Splits
@@ -30,12 +31,22 @@ socket.on('UploadedFile', function(file) {
 
     if(resourceManager.isInitialized(setup)) {
         //set up job table
+        messenger.publishTo("worker", "MapReduce", {mapper : setup.map, reducer : setup.reduce });
+        
         Object.keys(setup.data).forEach(function(key) {
              jobTable.push(JobFactory.createJob(setup.data[key], config.status.INCOMPLETE));
         });
-        console.log(setup);
-        console.log(jobTable);
-
+        var workers = messenger.getIdleWorkers();
+        console.log(workers);
+        for(var i = 0; i < workers.length; i++) {
+            var worker = workers[i]; //time to go to vork
+            var split = setup.data[i];
+            if(split != undefined) {
+                console.log('actually time to go to vork');
+                console.log(worker);
+                messenger.publishToSelectedWorkers([worker],"InputSplit", fs.readFileSync(setup.data[i],"utf8"));
+            }
+        }
     }
 });
 

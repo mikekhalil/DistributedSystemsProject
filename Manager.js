@@ -5,7 +5,7 @@ var config = require('./config.json');
 var splitter = require(__dirname + '/modules/SplitInput.js');
 const path = require('path');
 const resourceManager = require(__dirname + '/modules/ClientManager.js');
-const JobFactory = require(__dirname + '/modules/JobFactory.js');
+const JobManager = require(__dirname + '/modules/JobFactory.js');
 
 
 //Job Object : { inputSplit (primary key - string - path), status (string), worker (socketid - foreign key)}
@@ -34,7 +34,7 @@ socket.on('UploadedFile', function(file) {
         messenger.publishTo("worker", "MapReduce", {mapper : setup.map, reducer : setup.reduce });
         
         Object.keys(setup.data).forEach(function(key) {
-             jobTable.push(JobFactory.createJob(setup.data[key], config.status.INCOMPLETE));
+             jobTable.push(JobManager.createJob(setup.data[key], config.status.INCOMPLETE));
         });
         var workers = messenger.getIdleWorkers();
         console.log(workers);
@@ -44,7 +44,7 @@ socket.on('UploadedFile', function(file) {
             if(split != undefined) {
                 console.log('actually time to go to vork');
                 console.log(worker);
-                messenger.publishToSelectedWorkers([worker],"InputSplit", fs.readFileSync(setup.data[i],"utf8"));
+                messenger.publishToSelectedWorkers([worker],"InputSplit", {fileData : fs.readFileSync(setup.data[i],"utf8"), inputSplit : setup.data[i]});
             }
         }
     }
@@ -54,6 +54,24 @@ messenger.inchannel.subscribe("SystemReset" , function(msg) {
 	jobTable = []; 
 	setup = {map : null, reduce : null, data : null }; 
 }); 
+
+messenger.inchannel.subscribe("Results", function(msg) {
+    console.log(msg);
+    var sockid = "/#" + msg.data.sockid;
+    var completedJob = msg.data.inputSplit;
+    JobManager.setJobStatus(jobTable,completedJob,config.status.COMPLETE);
+    var job = JobManager.getNextJob(jobTable);
+    JobManager.setJobStatus(jobTable,job,config.status.ACTIVE);
+    var workers = messenger.getIdleWorkers();
+    if (job != null) {
+        //still has to go to vork
+        messenger.publishToSelectedWorkers([sockid], "InputSplit", {fileData : fs.readFileSync(job.path,"utf8"), inputSplit : job.path})
+    }
+    else {
+        //complete all jobs
+        console.log('completed all jobs');
+    }
+});
 
 console.log(config.topics.CLIENT_TABLE_UPDATE);
 messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {

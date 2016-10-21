@@ -10,7 +10,7 @@ function RecordReader(InputSplit, Config) {
         arr = InputSplit.split("\n");
         for(var i = 0; i < arr.length; i++) {
             //check to see if split ended on a new line
-            if(arr[i].length > 0)
+            if(arr[i].length > 0 && arr[i].length != "")
                 records.push({key : i, value : arr[i]});
         }
     }

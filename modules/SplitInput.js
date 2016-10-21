@@ -4,49 +4,54 @@
  */
 const path = require('path');
 
+function writeSplit(split, filepath) {
+	var fs = require('fs');
+	fs.writeFile(filepath, split, function(err) {
+	    if(err) {
+	        return console.log(err);
+	    }
+	}); 
+}
+
 var func = function SplitInput( file , splitDir) {
 
     var fs = require('fs'); 
-    var encoding = 'utf8';	/* character encoding		*/
-    var j = 0;			/* count num chars in split	*/
-    var split = '';		/* split string			*/
-    var splits = {};		/* store file path of splits	*/
-    var splitSize = 500;  	/* split size in bytes		*/
-    var splitCount = 0;		/* number of splits		*/
-    var filepath = '';		/* full path of split		*/
+    var util = require('util');
+    var stream = require('stream');
+    var es = require('event-stream');
+    var split = '';			/* split string				 */
+    var splits = {};		/* store file path of splits */
+    var splitSize = 6400;  	/* split size in bytes		 */
+    var splitCount = 0;		/* number of splits			 */
+    var filepath = '';		/* full path of split		 */
 
     if (!fs.existsSync(splitDir)) {
 		fs.mkdirSync(splitDir);
     }
 
-	console.log(file);
+    var s = fs.createReadStream(file)
+	    .pipe(es.split())
+	    .pipe(es.mapSync(function(line){
+	    	s.pause();
+	    	split += line;
+	    	if ( split.length >= splitSize ) {
+	    		filepath = path.join(splitDir, splitCount + '.txt');
+	    		writeSplit(split+"\n", filepath);
+	    		splits[splitCount++] = filepath;
+	    		split = '';    		
+	    	}
+	    	s.resume();
+	    })
 
-    var data = fs.readFileSync( file, encoding);
-	
-	for (var i = 0; i < data.length; i++) {
-	    // Reached max split size or end of file 
-	    if ( j == (splitSize-1) || i == (data.length-1) ) {
-		while ( data[i] != '\n' && i < data.length) {
-		    split += data[i++];
-		    j++;
-		}
-			split += data[i];
-			filepath = path.join(splitDir, splitCount + '.txt');
-			
-			// Write split to split directory
-			fs.writeFileSync(filepath, split, encoding);
-			splits[splitCount++] = filepath;
-			split = '';
-			j = 0;
-	    }
-	    // Append characters to the split
-	    else {
-			split += data[i];	
-			j++;
-	    }
-	}
-    
-    return splits;
+	    .on('error', function(){
+	        console.log('Error while reading file.');
+	    })
+	    .on('end', function(){
+	        console.log('Read entire file.')
+	        console.log(splits);
+	        return splits;
+	    })
+		);
 }
 
 module.exports = {

@@ -18,8 +18,8 @@ var func = function SplitInput(file, splitDir, callback) {
     var util = require('util');
     var stream = require('stream');
     var es = require('event-stream');
-    var split = '';         /* split string			 */
-    var splits = {};        /* store file path of splits         */
+    var split = '';         /* split string			     */
+    var splits = {};        /* store file path of splits */
     var splitCount = 0;     /* number of splits			 */
     var filepath = '';      /* full path of split		 */
     const splitSize = 6400; /* split size in bytes		 */
@@ -52,7 +52,7 @@ var func = function SplitInput(file, splitDir, callback) {
                     writeSplit(split + "\n", filepath);
                     splits[splitCount] = filepath;
                 }
-                return callback(splits);
+                callback(splits);
             })
         );
 }
@@ -61,10 +61,3 @@ var func = function SplitInput(file, splitDir, callback) {
 module.exports = {
     splitInput: func
 }
-
-/* Example of call back
- *
-SplitInput("test.txt", "testDirectory", function(splits) {
-	console.log(splits);
-});
-*/

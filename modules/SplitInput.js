@@ -13,17 +13,16 @@ function writeSplit(split, filepath) {
 	}); 
 }
 
-var func = function SplitInput( file , splitDir) {
-
+var func = function SplitInput( file , splitDir, callback ) {
     var fs = require('fs'); 
     var util = require('util');
     var stream = require('stream');
     var es = require('event-stream');
     var split = '';			/* split string				 */
     var splits = {};		/* store file path of splits */
-    var splitSize = 6400;  	/* split size in bytes		 */
     var splitCount = 0;		/* number of splits			 */
     var filepath = '';		/* full path of split		 */
+ 	const splitSize = 6400; /* split size in bytes		 */
 
     if (!fs.existsSync(splitDir)) {
 		fs.mkdirSync(splitDir);
@@ -47,13 +46,25 @@ var func = function SplitInput( file , splitDir) {
 	        console.log('Error while reading file.');
 	    })
 	    .on('end', function(){
-	        console.log('Read entire file.')
-	        console.log(splits);
-	        return splits;
+	       	// write last input split to file
+	    	if ( split.length > 0 ) {
+		        filepath = path.join(splitDir, splitCount + '.txt');
+		    	writeSplit(split+"\n", filepath);
+		    	splits[splitCount] = filepath;
+	  	  	}
+	        return callback(splits);
 	    })
 		);
 }
 
+
 module.exports = {
 	splitInput : func
 }
+
+/* Example of call back
+ *
+SplitInput("test.txt", "testDirectory", function(splits) {
+	console.log(splits);
+});
+*/

@@ -4,8 +4,22 @@ var MongoClient = require('mongodb').MongoClient;
 var config = require('./config.json');
 var reducer = require(__dirname + '/modules/Reducer.js');
 
+
+reduceFunc = null;
 socket.on('connect', function() { 
-	console.log("connected to socket server"); 	
+	console.log("connected to socket server");
+	MongoClient.connect(config.mongodb.url, function(err,db) {
+		if(!err) {
+			console.log("clearing mongo collection");
+			reducer.clearCollection(db,"jobs", reducer.closeConnection);
+			console.log('cleared collection');
+		}
+		else{
+			console.log(err);
+			reducer.closeConnection(db);
+		}
+		
+	});	
 }); 
 
 messenger.inchannel.subscribe(config.topics.SYSTEM_RESET , function(msg) {
@@ -14,18 +28,26 @@ messenger.inchannel.subscribe(config.topics.SYSTEM_RESET , function(msg) {
 
 }); 
 
+messenger.inchannel.subscribe("MapReduce", function(msg) {
+	console.log(msg.data);
+    reduceFunc = new Function('key','value',msg.data.reducer);
+});
+
 
 messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
 	//slave node finish MapReduce job
 	MongoClient.connect(config.mongodb.url, function(err, db) {
+		//console.log(msg.data);
 		if(!err){
-			console.log("Connected to mongodb instance");
-			console.log(msg.data);
-			reducer.closeConnection(db);
+			console.log("Got Results - Storing in mongodb");
+			//console.log(msg.data);
+			reducer.reduce(db,"jobs", msg.data, reduceFunc, reducer.closeConnection);
 		}
 		else {
 			console.log(err);
+			reducer.closeConnection(db);
 		}
+		
 	});
 
 	

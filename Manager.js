@@ -25,14 +25,16 @@ socket.on('UploadedFile', function(file) {
         var dir = path.join(__dirname,config.multer.path,'splits');
 
         //create directory for splits 
-        var inputSplits = splitter.splitInput(file.data,dir);
-        setup[file.type] = inputSplits;
+        splitter.splitInput(file.data,dir,function(inputSplits) {
+            setup[file.type] = inputSplits;
+        });
+        
     }
 
     if(resourceManager.isInitialized(setup)) {
         //set up job table
         messenger.publishTo("worker", "MapReduce", {mapper : setup.map, reducer : setup.reduce });
-        
+        messenger.publishTo("reducer", "MapReduce", {reducer : setup.reduce });
         Object.keys(setup.data).forEach(function(key) {
              jobTable.push(JobManager.createJob(setup.data[key], config.status.INCOMPLETE));
         });

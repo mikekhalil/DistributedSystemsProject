@@ -1,39 +1,34 @@
-var MainReduction = function(db,result, redFunc, cb){
-	var col = db.collection('jobs');
-	Object.keys(result).forEach(function(key) {
-		col.findOne({key : key},function(err,doc) {
+var MainReduction = function(db,collection,result, redFunc,cb){
+	var col = db.collection(collection);
+	console.log('started reducing');
+    Object.keys(result).forEach(function(key) {
+
+		col.insert({_id:key}, {'value': result[key]}, function(err, doc){
 			if(err) {
-				console.log(err);
+				col.update({_id:key}, {$inc: {'value':result[key]}});
 			}
-			
-			if(doc) {
-				console.log('found doc');	
-				var newVal = redFunc(key, [doc.value, result[key]]);
-				col.update({key : key}, {$set : {value : newVal }});
-				console.log('updated key : ' +  doc.key + ', value : '+ doc.value);
-			}
-			else {
-				//insert key and val
-				col.insertOne({"key" : key,"value" : result[key]}, function(err,result) {
-					if(err){
-						console.log(err);
-					}
-					console.log('didnt find doc, created new record');
-				});
-			}
-		})	
+		});
+	
+
 	});
-	cb(db);
+}
+
+var clearCollection = function(db, col, cb) {
+    var collection = db.collection(col);
+    collection.remove();
+    //db.close();
+    
 }
 
 var closeDB = function(db) {
 	console.log('closing db connection');
-	db.close();
+	//db.close();
 }
 
 
 
 module.exports = {
     reduce : MainReduction,
-    closeConnection : closeDB
+    closeConnection : closeDB,
+    clearCollection : clearCollection
 }

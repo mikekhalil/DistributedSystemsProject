@@ -1,16 +1,25 @@
+# Hadude
+
 This is a cross platform, distruted computing platform that allows users to solve fairly large problems over several machines
 
-Requirements:
+# Requirements:
     Node 
 
+# Contributing
+**1\.** Clone the repository:
 
-There are 2 easy ways to start the service
-    1) Run 'npm install', then run 'node Server.js'
-
-    Or 
-
-    2) Run 'npm start' which will essentially do the same thing for you
-
-
+```bash
+git clone https://github.com/mikekhalil/DistributedSystemsProject.git
+cd DistributedSystemsProject
+```
 
 
+**2\.** Install necessary modules:
+```bash
+npm install
+```
+**2\.** Run these two commands in seperate terminals:
+```bash
+npm start
+node Manager.js
+```

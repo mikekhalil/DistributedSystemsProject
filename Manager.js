@@ -59,7 +59,7 @@ messenger.inchannel.subscribe("SystemReset" , function(msg) {
 
 messenger.inchannel.subscribe("Results", function(msg) {
     console.log(msg);
-    var sockid = "/#" + msg.data.sockid;
+    var sockid = msg.data.sockid;
     var completedJob = msg.data.inputSplit;
     JobManager.setJobStatus(jobTable,completedJob,config.status.COMPLETE);
     var job = JobManager.getNextJob(jobTable);

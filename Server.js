@@ -9,18 +9,32 @@ var http = require('http');
 var server = http.createServer(app);  
 var io = require('socket.io').listen(server);
 var postal = require('postal');
+var stormpath = require('express-stormpath');
 
 /*globals*/
 var ClientTab = []; 
 
 app.use(express.static(__dirname + '/front_end'));
 
+app.use(stormpath.init(app, {
+	apiKey: {
+    	id: config.stormpath.KEY_ID,
+    	secret: config.stormpath.KEY_SECRET
+  	},
+  	application: {
+    	href: config.stormpath.APP_HREF
+  	},
+  	website : true
+}));
+
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/front_end/index.html');
 });
 
-
-server.listen(8080); 
+app.on('stormpath.ready', function() {
+	console.log('it vorked');
+	server.listen(8080); 
+});
 
 app.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){

@@ -23,5 +23,10 @@
         "IDLE" : "idle",
         "ACTIVE" : "active",
         "COMPLETE" : "complete"
+    },
+    "stormpath" : {
+        "KEY_ID" : "4B37INXGBBZWB0JMR260TSFUD",
+        "KEY_SECRET" : "A8/aqCNwZ2hr9dMwtAvgZgd8fsImGHTclTNNw1lOsow",
+        "APP_HREF" : "https://api.stormpath.com/v1/applications/5s4f9uxRoTB7XWm7b8WGna"
     }
 }

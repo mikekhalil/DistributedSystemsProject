@@ -32,6 +32,7 @@
     "babel-preset-stage-0": "6.3.13",
     "event-stream": "3.3.4",
     "express": "4.14.0",
+    "express-stormpath": "3.1.6",
     "install": "0.8.2",
     "lodash": "4.16.3",
     "mongodb": "2.2.10",
@@ -43,6 +44,7 @@
     "react": "0.14.6",
     "react-dom": "0.14.6",
     "react-dropzone": "3.7.0",
+    "react-router": "3.0.0",
     "socket.io": "1.5.1",
     "socket.io-client": "1.4.8",
     "webpack": "1.12.9"

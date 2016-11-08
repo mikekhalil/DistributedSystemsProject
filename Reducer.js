@@ -36,6 +36,7 @@ messenger.inchannel.subscribe("MapReduce", function(msg) {
 
 messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
 	//slave node finish MapReduce job
+	console.log("got results from nodes"); 
 	MongoClient.connect(config.mongodb.url, function(err, db) {
 		//console.log(msg.data);
 		if(!err){

@@ -61,7 +61,6 @@ io.on('connection', function(socket) {
 		io.emit('reducer' , msg); 
 	}); 
 	socket.on('worker', function (msg) {
-		console.log(msg);
 		var recip = msg.id;
 		console.log('recipients\n=-=-=-=\n'); 
 		console.log(recip);

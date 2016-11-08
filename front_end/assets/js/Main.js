@@ -8,6 +8,7 @@ messenger.inchannel.subscribe("MapReduce", function(packet) {
 
 messenger.inchannel.subscribe("InputSplit", function(packet) {
     console.log('InputSplit');
+    console.log(packet);
     var input = packet.data.fileData;
     var records = RecordReader(input, {type: "TextInputFormat"});
     var ShuffledData = Mapper( mapper, records );

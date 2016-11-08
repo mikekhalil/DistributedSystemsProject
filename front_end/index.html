@@ -26,28 +26,7 @@
         <script src="assets/js/Reducer/Reducer.js"></script>
         <script src="assets/js/Mapper/Mapper.js"></script>
         <script src="assets/js/Main.js"></script>
-
-
-
-        <!--<script>
-            //test script
-            var mapWordCount = function(key, val) {
-                var arr = [];
-                var words = val.split(" ");
-                for(var i = 0; i < words.length; i++) {
-                    var word = words[i];
-                    var obj = {key : word, value : 1 };
-                    arr.push(obj);
-                }
-                return arr;
-            }
-            var input = "But one hundred years later, the Negro still is not free.\n One hundred years later, the life of the Negro is still sadly crippled by the manacles of segregation and the chains of discrimination. "
-            var records = RecordReader(input, {type: "TextInputFormat"});
-            var ShuffledData = Mapper( mapWordCount, records );
-            var ReducedData = Reducer( ShuffledData, reduceFunc, null );
-            console.log('reduced data ');
-            console.log(ReducedData);
-       </script> -->
+        
     </head>
     <body ng-app="cream">
       <div ng-view></div>

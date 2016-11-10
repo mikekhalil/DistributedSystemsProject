@@ -48,7 +48,7 @@ app.post('/InputFiles', function (req, res) {
 
 io.on('connection', function(socket) {
 	
-	console.log('a client connected');
+	//console.log('a client connected');
 	io.emit('clientTabUpdate' , ClientTab); 
 
 	socket.on('register', function (msg) {
@@ -62,16 +62,15 @@ io.on('connection', function(socket) {
 	}); 
 	socket.on('worker', function (msg) {
 		var recip = msg.id;
-		console.log('recipients\n=-=-=-=\n'); 
-		console.log(recip);
+		//console.log(recip);
 		if (recip != null ) {
 			for (x in recip) {
-				console.log("relay to " + msg.id[x]); 
+				//console.log("relay to " + msg.id[x]); 
 				io.to(msg.id[x]).emit("worker", msg);	
 			}
 		}
 		else {
-			console.log("CREAM");
+			//console.log("CREAM");
 			io.emit('worker', msg); 
 		}
 	});
@@ -81,8 +80,8 @@ io.on('connection', function(socket) {
 				ClientTab.splice(x,1); 
 			}
 		}
-		console.log('A client disconnected'); 
-		console.log(ClientTab); 
+		// console.log('A client disconnected'); 
+		// console.log(ClientTab); 
 		io.emit('clientTabUpdate' , ClientTab);
 	}); 
 	socket.on('server', function (msg){
@@ -123,7 +122,7 @@ function registerClient(socket, msg) {
 			role: msg.sender
 		});
 	io.emit('clientTabUpdate' , ClientTab);
-    console.log(ClientTab); 
+    //console.log(ClientTab); 
 }
 
 

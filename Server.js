@@ -9,20 +9,91 @@ var http = require('http');
 var server = http.createServer(app);  
 var io = require('socket.io').listen(server);
 var postal = require('postal');
+var bodyParser  = require('body-parser');
+var morgan      = require('morgan');
+var mongoose    = require('mongoose');
+var jwt    = require('jsonwebtoken'); 
+var User   = require(__dirname + '/models/user'); // get our mongoose model
+    
 
 /*globals*/
 var ClientTab = []; 
 
+var apiRoutes = express.Router(); 
 app.use(express.static(__dirname + '/front_end'));
+mongoose.connect(config.mongodb.url);
 
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/front_end/index.html');
-});
+app.use(morgan('dev'));
+
+app.set('secret', config.secret); 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 
 
 server.listen(8080); 
 
-app.post('/InputFiles', function (req, res) {
+//angular app
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/front_end/index.html');
+});
+
+//API
+app.use('/api', apiRoutes);
+apiRoutes.use(function(req, res, next) {
+
+	// check header or url parameters or post parameters for token
+	var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+	// decode token
+	if (token) {
+	
+		// verifies secret and checks exp
+		jwt.verify(token, app.get('secret'), function(err, decoded) {      
+		if (err) {
+			return res.json({ success: false, error : err});    
+		} 
+		else {
+			// if everything is good, save to request for use in other routes
+			req.decoded = decoded;    
+			next();
+		}
+	});
+
+	} 
+	else {
+		// if there is no token
+		// return an error
+		return res.status(403).send({ 
+			success: false, 
+			message: 'No token provided.' 
+		});
+	}
+});
+
+
+
+app.post('/register', function(req,res) {
+	data = req.body;
+	var newUser = new User({ 
+		data : {
+			name: data.name, 
+			email: data.email
+		},
+		pw: data.pw
+	});
+
+	// save the new user
+	newUser.save(function(err) {
+		if (err) {
+			console.log(err);
+			res.json({success: false, error : err});
+		}
+		res.json({ success: true });
+  	});
+});
+
+apiRoutes.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){
         //send response to client
         if(err){
@@ -41,11 +112,56 @@ app.post('/InputFiles', function (req, res) {
 		//just send path to data file
 		var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
 		io.emit('UploadedFile', payload);
-		
     })
 });
 
 
+apiRoutes.get('/user', function(req, res) {
+  console.log(req.decoded._doc);
+  res.json(req.decoded._doc.data);
+});   
+
+apiRoutes.get('/group', function(req,res) {
+
+});
+
+app.post('/authenticate', function(req, res) {
+	// find the user
+	console.log(req.body);
+	
+	User.findOne({'data.email' : req.body.email}, function(err, user) {
+		if (err) 
+			throw err;
+
+		if (!user) {
+			res.json({ success: false, message: 'User not found.' });
+		} 
+		else {
+			console.log(user.password + ' | ' + req.body.password);
+			if (user.pw != req.body.password) {
+				res.json({ success: false, message: 'Wrong password.' });
+			} 
+			else {
+				// create a token
+				var token = jwt.sign(user, app.get('secret'), {
+					expiresIn: 60 * 60 * 24 // expires in 24 hours
+				});
+
+				//send token
+				res.json({
+					success: true,
+					token: token
+				});
+			}   
+		}
+
+  	});
+});
+
+
+
+
+//socket server stuff
 io.on('connection', function(socket) {
 	
 	//console.log('a client connected');

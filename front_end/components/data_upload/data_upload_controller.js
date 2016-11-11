@@ -1,6 +1,9 @@
-app.controller('uploadController', ['$scope','Upload','$timeout', function($scope,Upload,$timeout) {
+app.controller('uploadController', ['$scope','Upload','$timeout','$location', function($scope,Upload,$timeout,$location) {
     $scope.cream = "This is the value of cream";
-    
+    $scope.isActive = function(route) {
+        console.log('activity changed');
+        return $location.path().includes(route);
+    }
     $scope.dataLog = '';
     $scope.mapLog = '';
     $scope.reduceLog = '';

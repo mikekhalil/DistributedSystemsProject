@@ -19,8 +19,6 @@ var setJobStatus = function(jobs,path,status) {
 }
 
 var getNextJob = function(jobs) {
-    console.log('getting next job');
-    console.log(jobs.length);
     for(var i = 0; i < jobs.length; i++) {
         cur = jobs[i];
         if(cur.status != config.status.ACTIVE && cur.status != config.status.COMPLETE) {

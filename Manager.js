@@ -13,11 +13,9 @@ var jobTable = [];
 var setup = {map : null, reduce : null, data : null }
 
 //use client table and job table to assign jobs based off availability
-
 socket.on('UploadedFile', function(file) {
     if( file.type === config.REDUCE || file.type === config.MAP ){
         var fileData = fs.readFileSync(file.data, "utf8");
-        //setup[file.type] = new Function(fileData);
         setup[file.type] = fileData;
     }
     else {
@@ -39,12 +37,10 @@ socket.on('UploadedFile', function(file) {
              jobTable.push(JobManager.createJob(setup.data[key], config.status.INCOMPLETE));
         });
         var workers = messenger.getIdleWorkers();
-        console.log(workers);
         for(var i = 0; i < workers.length; i++) {
-            var worker = workers[i]; //time to go to vork
+            var worker = workers[i]; 
             var split = setup.data[i];
             if(split != undefined) {
-                console.log('actually time to go to vork');
                 console.log(worker);
                 messenger.publishToSelectedWorkers([worker],"InputSplit", {fileData : fs.readFileSync(setup.data[i],"utf8"), inputSplit : setup.data[i]});
             }
@@ -67,10 +63,6 @@ messenger.inchannel.subscribe("Results", function(msg) {
     if (job != null) {
         //still has to go to vork
         messenger.publishToSelectedWorkers([sockid], "InputSplit", {fileData : fs.readFileSync(job.path,"utf8"), inputSplit : job.path})
-    }
-    else {
-        //complete all jobs
-        console.log('completed all jobs');
     }
 });
 

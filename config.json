@@ -23,5 +23,6 @@
         "IDLE" : "idle",
         "ACTIVE" : "active",
         "COMPLETE" : "complete"
-    }
+    },
+    "secret" : "ilikepotatoes"
 }

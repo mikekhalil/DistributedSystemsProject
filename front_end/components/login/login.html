@@ -1,0 +1,26 @@
+
+<div class="col-md-6 col-md-offset-3 green">
+    <h2>Login</h2>
+    <form  name="form" ng-submit="form.$valid && vm.login()" novalidate>
+        <div class="form-group" ng-class="{ 'has-error': form.$submitted && form.username.$invalid }">
+            <input data-color="green" type="text" placeholder="Email" name="username" class="form-control" ng-model="username" required />
+            <div ng-messages="form.$submitted && form.username.$error" class="help-block">
+                <div ng-message="required">Email is required</div>
+            </div>
+        </div>
+        <div data-color="green" class="form-group" ng-class="{ 'has-error': form.$submitted && form.password.$invalid }">
+            <input placeholder="Password" type="password" name="password" class="form-control" ng-model="password" required />
+            <div ng-messages="form.$submitted && form.password.$error" class="help-block">
+                <div ng-message="required">Password is required</div>
+            </div>
+        </div>
+        
+          <a ng-href="#/register"><br> <p>Don't have an account? Sign up!</p> </a>
+        <div class="form-group">
+            <button data-color="green" ng-disabled="vm.loading" class="btn btn-primary" ng-click="login()">Login</button>
+        </div>
+        <div ng-if="error" class="alert alert-danger">{{error}}</div>
+        
+    </form>
+  
+</div>

@@ -29,7 +29,6 @@ messenger.inchannel.subscribe(config.topics.SYSTEM_RESET , function(msg) {
 }); 
 
 messenger.inchannel.subscribe("MapReduce", function(msg) {
-	console.log(msg.data);
     reduceFunc = new Function('key','value',msg.data.reducer);
 });
 
@@ -38,10 +37,8 @@ messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
 	//slave node finish MapReduce job
 	console.log("got results from nodes"); 
 	MongoClient.connect(config.mongodb.url, function(err, db) {
-		//console.log(msg.data);
 		if(!err){
 			console.log("Got Results - Storing in mongodb");
-			//console.log(msg.data);
 			reducer.reduce(db,"jobs", msg.data, reduceFunc, reducer.closeConnection);
 		}
 		else {

@@ -1,4 +1,4 @@
-app.controller('uploadController', ['$scope','Upload','$timeout','$location', function($scope,Upload,$timeout,$location) {
+app.controller('uploadController', ['$scope','Upload','$timeout','$location','$localStorage', function($scope,Upload,$timeout,$location,$localStorage) {
     $scope.cream = "This is the value of cream";
     $scope.isActive = function(route) {
         console.log('activity changed');
@@ -8,7 +8,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location', fu
     $scope.mapLog = '';
     $scope.reduceLog = '';
     
-    
+    var token = $localStorage.currentUser.token
     
     $scope.$watch('dataFiles', function () {
         $scope.upload($scope.dataFiles,'dataLog', "data");
@@ -48,11 +48,12 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location', fu
               var file = files[i];
               if (!file.$error) {
                 Upload.upload({
-                    url: 'http://localhost:8080/InputFiles/',
+                    url: 'http://localhost:8080/api/InputFiles/',
                     data: {
                       file: file,
                       type : type 
-                    }
+                    },
+                    headers : {'x-access-token' : token }
                 }).then(function (resp) {
                     $timeout(function() {
                         $scope[log] = 'file: ' +

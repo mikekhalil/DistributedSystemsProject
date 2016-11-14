@@ -14,15 +14,13 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
             })
             .then(function(rsp) {
                 // success
-                console.log(rsp);
-                
                 if (rsp.data.token) {
                     // store username and token in local storage to keep user logged in between page refreshes
                     $localStorage.currentUser = { username: username, token: rsp.data.token };
                     User.setUser($localStorage.currentUser);
                     // add jwt token to auth header for all requests made by the $http service
                     $http.defaults.headers.common.Authorization = 'Bearer ' + rsp.data.token;
-                    $rootScope._name = username;
+                    $rootScope._user = $localStorage.currentUser;
 
                     // execute callback with true to indicate successful login
                     callback(true);

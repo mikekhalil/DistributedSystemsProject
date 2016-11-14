@@ -1,5 +1,5 @@
-app.controller('profileController', ['$location', '$route', '$scope', function($location,$scope,$route) {
-    
+app.controller('profileController', ['$location', '$route', '$scope','$rootScope', function($location,$scope,$route,$rootScope) {
+
 
 
 

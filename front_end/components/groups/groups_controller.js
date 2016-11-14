@@ -3,7 +3,7 @@ app.controller('groupsController', ['$location', '$route', '$scope','$http','$lo
     	$(id).modal('hide');
     }
     var token = $localStorage.currentUser.token
-    console.log(token);
+    
     $scope.groups = [
     {
     	"gName": "Xinu",
@@ -43,19 +43,14 @@ app.controller('groupsController', ['$location', '$route', '$scope','$http','$lo
     }
     $scope.getGroups();
     $scope.createGroup = function() { 
-    	console.log($scope.groupName);
-    	if($localStorage.currentUser)
-    		console.log($localStorage.currentUser);
     	$http({
-
                 url: '/api/registerGroup',
                 method: "POST",
-                data: { name : $scope.groupName, token : $localStorage.currentUser.token }
-
+                data: { name : $scope.groupName},
+				headers: {'x-access-token' : token }
             })
             .then(function(rsp) {
                 // success
-                console.log(rsp);
                 closeModal('#myModal');
                 $scope.getGroups();
                 

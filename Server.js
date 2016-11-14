@@ -14,6 +14,7 @@ var morgan      = require('morgan');
 var mongoose    = require('mongoose');
 var jwt    = require('jsonwebtoken'); 
 var User   = require(__dirname + '/models/user'); // get our mongoose model
+var Group = require(__dirname + '/models/group');
     
 
 /*globals*/
@@ -25,7 +26,7 @@ mongoose.connect(config.mongodb.url);
 
 app.use(morgan('dev'));
 
-app.set('secret', config.secret); 
+app.set('secret', config.secret); 	//TODO make this a random secret for production
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -72,9 +73,29 @@ apiRoutes.use(function(req, res, next) {
 });
 
 
+apiRoutes.post('/registerGroup', function(req,res) {
+	var user = req.decoded._doc.data;
+	var name = req.body.name;
+	console.log(user);
+	var newGroup = new Group({
+		users : [user.email],
+		admins : [user.email],
+		name : name,
+		jobs : []
+	});
+	
+	newGroup.save(function(err) {
+		if(err) {
+			console.log(err);
+			res.json({success : false, error : err});
+		}
+		res.json({success : true });
+	});
+})
 
-app.post('/register', function(req,res) {
-	data = req.body;
+
+app.post('/registerUser', function(req,res) {
+	var data = req.body;
 	var newUser = new User({ 
 		data : {
 			name: data.name, 
@@ -117,7 +138,6 @@ apiRoutes.post('/InputFiles', function (req, res) {
 
 
 apiRoutes.get('/user', function(req, res) {
-  console.log(req.decoded._doc);
   res.json(req.decoded._doc.data);
 });   
 
@@ -137,7 +157,7 @@ app.post('/authenticate', function(req, res) {
 			res.json({ success: false, message: 'User not found.' });
 		} 
 		else {
-			console.log(user.password + ' | ' + req.body.password);
+			console.log(user.pw + ' | ' + req.body.password);
 			if (user.pw != req.body.password) {
 				res.json({ success: false, message: 'Wrong password.' });
 			} 

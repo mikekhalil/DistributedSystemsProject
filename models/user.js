@@ -4,7 +4,9 @@ var Schema = mongoose.Schema;
 module.exports = mongoose.model('User', new Schema({ 
     data : {
         email: String,
-        name: String
+        name: String,
+        groups: [String],     
+        jobs: [String]
     },
     pw: String 
 }));

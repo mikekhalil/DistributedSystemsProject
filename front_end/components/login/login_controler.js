@@ -1,12 +1,11 @@
 app.controller('loginController', ['UserService','$rootScope','$scope','$localStorage','$location','$http',  function(User,$rootScope,$scope,$localStorage,$location,$http){
         
    
-        $scope.$watch('$localStorage.currentUser', function() {
-            if($localStorage.currentUser){
-                //already logged in, bring them to dashboard
-                $location.path('/dashboard');
-            }    
-        });
+        if($localStorage.currentUser){
+            //already logged in, bring them to dashboard
+            $location.path('/dashboard');
+        }    
+       
         function Authenticate(username, password, callback) {
             $http({
                 url: '/authenticate',
@@ -23,6 +22,7 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
                     User.setUser($localStorage.currentUser);
                     // add jwt token to auth header for all requests made by the $http service
                     $http.defaults.headers.common.Authorization = 'Bearer ' + rsp.data.token;
+                    $rootScope._name = username;
 
                     // execute callback with true to indicate successful login
                     callback(true);

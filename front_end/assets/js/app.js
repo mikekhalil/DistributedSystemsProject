@@ -37,6 +37,10 @@ app.config(function($routeProvider) {
         if ($localStorage.currentUser) {
             //TODO FIX THIS
             $http.defaults.headers['x-access-token'] = $localStorage.currentUser.token;
+            $rootScope._user = $localStorage.currentUser;
+        }
+        else {
+            $rootScope._user = null;
         }
  
         // redirect to login page if not logged in and trying to access a restricted page

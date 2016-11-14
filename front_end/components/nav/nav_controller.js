@@ -9,6 +9,7 @@ app.controller('navController', ['UserService','$rootScope','$scope','$localStor
     $scope.logout =   function () {
             // remove user from local storage and clear http auth header
             delete $localStorage.currentUser;
+            $rootScope._user = null;
             if ($http.defaults) {
                 $http.defaults.headers.common.Authorization = '';
             }

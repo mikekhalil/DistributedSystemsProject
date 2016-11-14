@@ -15,13 +15,17 @@
         <script src="https://cdn.jsdelivr.net/lodash/4.16.1/lodash.js"></script>
         <script src="assets/js/ClientMessenger/postal.js"></script>
         <script src="assets/js/ClientMessenger/ClientMessenger.js"></script>
-        
-        <!-- MapReduce -->
-        <script src="components/data_upload/data_upload_controller.js"></script>
+
+        <!-- UI Controllers -->
         <script src="components/dashboard/dashboard_controller.js"></script>
         <script src="components/login/AuthenticationService.js"></script>
         <script src="components/login/login_controler.js"></script>
         <script src="components/nav/nav_controller.js"></script> 
+        <script src="components/groups/groups_controller.js"></script> 
+        <script src="components/profile/profile_controller.js"></script> 
+        
+        <!-- MapReduce -->
+        <script src="components/data_upload/data_upload_controller.js"></script>
         <script src="assets/js/RecordReader/RecordReader.js"></script>
         <script src="assets/js/Reducer/Reducer.js"></script>
         <script src="assets/js/Mapper/Mapper.js"></script>
@@ -59,20 +63,14 @@
                                 <p>Data Upload</p>
                             </a>
                         </li>
-                        <li>
-                            <a ng-href="#/">
-                                <i class="material-icons">content_paste</i>
-                                <p>Create Group</p>
+                        <li ng-class="{active:isActive('/groups')}">
+                            <a ng-href="#/groups">
+                                <i class="material-icons">group_work</i>
+                                <p>Groups</p>
                             </a>
                         </li>
-                        <li>
-                            <a ng-href="#/">
-                                <i class="material-icons">person</i>
-                                <p>Profile</p>
-                            </a>
-                        </li>
-                         <li>
-                            <a ng-href="#/">
+                        <li ng-class="{active:isActive('/profile')}">
+                            <a ng-href="#/profile">
                                 <i class="material-icons">person</i>
                                 <p>Profile</p>
                             </a>
@@ -80,7 +78,7 @@
                         <li>
                             <a ng-click="logout()" ng-href="#/">
                                 <i class="material-icons">launch</i>
-                                <p> Log out </p>
+                                <p> Log out </p></a>
                         </li>
                     </ul>
                 </div>

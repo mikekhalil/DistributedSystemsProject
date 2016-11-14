@@ -17,6 +17,16 @@ app.config(function($routeProvider) {
         controller : 'dashboardController',
         activetab : 'dashboard'
   })
+   .when('/groups',{
+        templateUrl: 'components/groups/groups.html',
+        controller : 'groupsController',
+        activetab : 'groups'
+  })
+   .when('/profile',{
+        templateUrl: 'components/profile/profile.html',
+        controller : 'profileController',
+        activetab : 'profile'
+  })
     .otherwise({redirectTo: '/'});
 })
     .run(run);

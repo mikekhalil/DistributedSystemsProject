@@ -1,4 +1,4 @@
-app.controller('dashboardController', ['$location', '$route', '$scope', function($location,$scope,$route) {
+app.controller('dashboardController', ['$location', '$route', '$scope', function($location,$route,$scope) {
     
 
 

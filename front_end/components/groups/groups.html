@@ -1,0 +1,20 @@
+<div class="container">
+  <h1>Groups</h1>
+  <p>Click on a group to join or <a href="">create</a> a new group:</p>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Group</th>
+        <th>Users Online</th>
+        <th>Jobs Queued</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="x in groups">
+        <td>{{x.gName}}</td>
+        <td>{{x.gNumUsers}}</td>
+        <td>{{x.gNumJobs}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

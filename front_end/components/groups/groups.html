@@ -1,20 +1,50 @@
+<style>
+body.modal-open div.modal-backdrop { 
+    z-index: 0; 
+}
+</style>
+
 <div class="container">
   <h1>Groups</h1>
-  <p>Click on a group to join or <a href="">create</a> a new group:</p>
+  <p>Click on a group to join or create a new group.</p>
   <table class="table table-hover">
     <thead>
       <tr>
         <th>Group</th>
         <th>Users Online</th>
-        <th>Jobs Queued</th>
+        <th>Jobs Queued</th> 
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="x in groups">
-        <td>{{x.gName}}</td>
-        <td>{{x.gNumUsers}}</td>
-        <td>{{x.gNumJobs}}</td>
+        <td>{{x.name}}</td>
+         <td>{{x.numUsers}}</td>
+        <td>{{x.numJobs}}</td>
       </tr>
     </tbody>
   </table>
+
+  <button class="btn btn-success btn-fab btn-fab-mini btn-round" data-toggle="modal" data-target="#myModal">
+      <i class="material-icons">add</i>
+  </button>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Create a group</h4>
+      </div>
+      <div class="modal-body">
+      <p>Group name: <input type="text" ng-model="groupName" value=""></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button ng-click="createGroup()"type="button" class="btn btn-success">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>

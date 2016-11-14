@@ -42,16 +42,17 @@ app.get('/', function (req, res) {
 //API
 app.use('/api', apiRoutes);
 apiRoutes.use(function(req, res, next) {
-
+	console.log(req.headers);
 	// check header or url parameters or post parameters for token
 	var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
+	console.log('token : ' + token);
 	// decode token
 	if (token) {
-	
+		
 		// verifies secret and checks exp
 		jwt.verify(token, app.get('secret'), function(err, decoded) {      
 		if (err) {
+			console.log('couldnt verify token');
 			return res.json({ success: false, error : err});    
 		} 
 		else {
@@ -74,6 +75,7 @@ apiRoutes.use(function(req, res, next) {
 
 
 apiRoutes.post('/registerGroup', function(req,res) {
+	console.log('ay');
 	var user = req.decoded._doc.data;
 	var name = req.body.name;
 	console.log(user);
@@ -112,6 +114,17 @@ app.post('/registerUser', function(req,res) {
 		}
 		res.json({ success: true });
   	});
+});
+
+apiRoutes.get('/groups', function(req,res) {
+	Group.find({}, function(err, groups) {
+		if(err){
+			console.log(err);
+			res.json({success : false, error : err});
+		}
+		res.json({success : true, groups : groups});
+	});
+
 });
 
 apiRoutes.post('/InputFiles', function (req, res) {

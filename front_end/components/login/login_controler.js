@@ -1,10 +1,35 @@
 app.controller('loginController', ['UserService','$rootScope','$scope','$localStorage','$location','$http',  function(User,$rootScope,$scope,$localStorage,$location,$http){
         
-   
+        closeModal = function(id) {
+            $(id).modal('hide');
+        }
         if($localStorage.currentUser){
             //already logged in, bring them to dashboard
             $location.path('/dashboard');
         }    
+
+        $scope.createUser = function() { 
+        console.log($scope.userName);
+        console.log($scope.email);
+        console.log($scope.password);
+        $http({
+                url: '/registerUser',
+                method: "POST",
+                data: { name : $scope.userName, email: $scope.email, pw: $scope.password}
+            })
+            .then(function(rsp) {
+                // success
+                closeModal('#regModal');
+                //$scope.getGroups();
+                
+            }, 
+            function(rsp) { 
+                // failed
+                console.log(rsp);
+                //generate error message
+             });
+        }
+
        
         function Authenticate(username, password, callback) {
             $http({

@@ -58,15 +58,16 @@ messenger.inchannel.subscribe("SystemReset" , function(msg) {
 }); 
 
 messenger.inchannel.subscribe("Results", function(msg) {
-    console.log(msg);
     var sockid = msg.data.sockid;
     var completedJob = msg.data.inputSplit;
     JobManager.setJobStatus(jobTable,completedJob,config.status.COMPLETE);
     var job = JobManager.getNextJob(jobTable);
     JobManager.setJobStatus(jobTable,job,config.status.ACTIVE);
+   
     var workers = messenger.getIdleWorkers();
     if (job != null) {
         //still has to go to vork
+         console.log(job.path);
         messenger.publishToSelectedWorkers([sockid], "InputSplit", {fileData : fs.readFileSync(job.path,"utf8"), inputSplit : job.path})
     }
     else {

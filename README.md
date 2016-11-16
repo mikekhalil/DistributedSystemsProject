@@ -18,8 +18,11 @@ cd DistributedSystemsProject
 ```bash
 npm install
 ```
-**3\.** Run these two commands in seperate terminals.
+**3\.** Run these three commands to start the server, the manager, and reducer.
 ```bash
 npm start
 node Manager.js
+node Reducer.js
 ```
+
+**4\.** Connect to localhost:8080.

@@ -9,7 +9,7 @@ var http = require('http');
 var server = http.createServer(app);  
 var io = require('socket.io').listen(server);
 var postal = require('postal');
-
+var tracker = require(__dirname + '/modules/Tracker.js'); 
 /*globals*/
 var ClientTab = []; 
 
@@ -62,16 +62,15 @@ io.on('connection', function(socket) {
 	}); 
 	socket.on('worker', function (msg) {
 		var recip = msg.id;
-		console.log('recipients\n=-=-=-=\n'); 
-		console.log(recip);
+		//console.log('recipients\n=-=-=-=\n'); 
+		//console.log(recip);
 		if (recip != null ) {
 			for (x in recip) {
-				console.log("relay to " + msg.id[x]); 
+				//console.log("relay to " + msg.id[x]); 
 				io.to(msg.id[x]).emit("worker", msg);	
 			}
 		}
 		else {
-			console.log("CREAM");
 			io.emit('worker', msg); 
 		}
 	});
@@ -111,6 +110,9 @@ io.on('connection', function(socket) {
 				}
 			}
 			io.emit('clientTabUpdate' , ClientTab);	
+		} 
+		else if(msg.topic=="TimeTracking") {
+			tracker.LOG(msg); 
 		}
 
 	}); 

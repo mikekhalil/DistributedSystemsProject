@@ -6,7 +6,7 @@ var splitter = require(__dirname + '/modules/SplitInput.js');
 const path = require('path');
 const resourceManager = require(__dirname + '/modules/ClientManager.js');
 const JobManager = require(__dirname + '/modules/JobFactory.js');
-
+var d; 
 
 //Job Object : { inputSplit (primary key - string - path), status (string), worker (socketid - foreign key)}
 var jobTable = [];
@@ -15,6 +15,9 @@ var setup = {map : null, reduce : null, data : null }
 //use client table and job table to assign jobs based off availability
 
 socket.on('UploadedFile', function(file) {
+    d = new Date(); 
+    //messenger.publishTo("server" , "TimeTracking" , {data : ("File Uploaded: " + file.type), timestamp : d.getTime()}); 
+
     if( file.type === config.REDUCE || file.type === config.MAP ){
         var fileData = fs.readFileSync(file.data, "utf8");
         //setup[file.type] = new Function(fileData);
@@ -39,14 +42,17 @@ socket.on('UploadedFile', function(file) {
              jobTable.push(JobManager.createJob(setup.data[key], config.status.INCOMPLETE));
         });
         var workers = messenger.getIdleWorkers();
-        console.log(workers);
+        //console.log(workers);
+        d = new Date(); 
+        messenger.publishTo("server" , "TimeTracking" , {data : "Uploading InputSplits to workers", timestamp : d.getTime()}); 
         for(var i = 0; i < workers.length; i++) {
             var worker = workers[i]; //time to go to vork
             var split = setup.data[i];
             if(split != undefined) {
-                console.log('actually time to go to vork');
-                console.log(worker);
+                //console.log('actually time to go to vork');
+                //console.log(worker);
                 messenger.publishToSelectedWorkers([worker],"InputSplit", {fileData : fs.readFileSync(setup.data[i],"utf8"), inputSplit : setup.data[i]});
+                
             }
         }
     }
@@ -58,24 +64,26 @@ messenger.inchannel.subscribe("SystemReset" , function(msg) {
 }); 
 
 messenger.inchannel.subscribe("Results", function(msg) {
-    console.log(msg);
+  
     var sockid = msg.data.sockid;
     var completedJob = msg.data.inputSplit;
     JobManager.setJobStatus(jobTable,completedJob,config.status.COMPLETE);
     var job = JobManager.getNextJob(jobTable);
     JobManager.setJobStatus(jobTable,job,config.status.ACTIVE);
-    var workers = messenger.getIdleWorkers();
     if (job != null) {
         //still has to go to vork
+        console.log(job.path);
         messenger.publishToSelectedWorkers([sockid], "InputSplit", {fileData : fs.readFileSync(job.path,"utf8"), inputSplit : job.path})
     }
     else {
         //complete all jobs
         console.log('completed all jobs');
+        d = new Date(); 
+        messenger.publishTo("server" , "TimeTracking" , {data : "Finished", timestamp : d.getTime()}); 
     }
 });
 
-console.log(config.topics.CLIENT_TABLE_UPDATE);
+//console.log(config.topics.CLIENT_TABLE_UPDATE);
 messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {
-    console.log(msg);
+   // console.log(msg);
 })

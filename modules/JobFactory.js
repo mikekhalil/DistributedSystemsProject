@@ -16,14 +16,17 @@ var setJobStatus = function(jobs,path,status) {
             break;
         }
     }
+
+    
 }
 
 var getNextJob = function(jobs) {
-    console.log('getting next job');
-    console.log(jobs.length);
+   
+  //  console.log(jobs);
     for(var i = 0; i < jobs.length; i++) {
         cur = jobs[i];
-        if(cur.status != config.status.ACTIVE && cur.status != config.status.COMPLETE) {
+        if(cur.status == config.status.INCOMPLETE) {
+            //console.log(cur);
             return cur;
         }
     }

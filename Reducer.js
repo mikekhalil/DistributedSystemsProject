@@ -3,7 +3,9 @@ var messenger = require(__dirname + '/modules/messenger.js')(socket, "reducer");
 var MongoClient = require('mongodb').MongoClient;
 var config = require('./config.json');
 var reducer = require(__dirname + '/modules/Reducer.js');
+var d; 
 
+var numInputSplits = 3;
 
 reduceFunc = null;
 socket.on('connect', function() { 
@@ -15,7 +17,7 @@ socket.on('connect', function() {
 			console.log('cleared collection');
 		}
 		else{
-			console.log(err);
+			//console.log(err);
 			reducer.closeConnection(db);
 		}
 		

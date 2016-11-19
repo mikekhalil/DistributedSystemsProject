@@ -9,25 +9,32 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
         }    
 
         $scope.createUser = function() { 
-        console.log($scope.userName);
-        console.log($scope.email);
-        console.log($scope.password);
-        $http({
-                url: '/registerUser',
-                method: "POST",
-                data: { name : $scope.userName, email: $scope.email, pw: $scope.password}
-            })
-            .then(function(rsp) {
-                // success
-                closeModal('#regModal');
-                //$scope.getGroups();
+            console.log($scope.registerName + " " + $scope.registerEmail + " " + $scope.registerPassword);
+            $http({
+                    url: '/registerUser',
+                    method: "POST",
+                    data: { name : $scope.registerName, email: $scope.registerEmail, pw: $scope.registerPassword}
+                })
+                .then(function(rsp) {
+                    // success
                 
-            }, 
-            function(rsp) { 
-                // failed
-                console.log(rsp);
-                //generate error message
-             });
+                   
+                    Authenticate($scope.registerEmail, $scope.registerPassword, function (result) {
+                        console.log(result);
+                        closeModal('#regModal');
+                        closeModal('#regModal');
+
+                        $location.path('/dashboard');
+                        
+                    });
+                    
+                }, 
+                function(rsp) { 
+                    // failed
+                    console.log(rsp);
+                    //generate error message
+                });
+            
         }
 
        
@@ -40,6 +47,7 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
             .then(function(rsp) {
                 // success
                 if (rsp.data.token) {
+                    console.log('what');
                     // store username and token in local storage to keep user logged in between page refreshes
                     $localStorage.currentUser = { username: username, token: rsp.data.token };
                     User.setUser($localStorage.currentUser);

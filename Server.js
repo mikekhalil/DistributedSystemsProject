@@ -42,10 +42,10 @@ app.get('/', function (req, res) {
 //API
 app.use('/api', apiRoutes);
 apiRoutes.use(function(req, res, next) {
-	console.log(req.headers);
+	//console.log(req.headers);
 	// check header or url parameters or post parameters for token
 	var token = req.body.token || req.query.token || req.headers['x-access-token'];
-	console.log('token : ' + token);
+	//console.log('token : ' + token);
 	// decode token
 	if (token) {
 		
@@ -130,6 +130,9 @@ apiRoutes.get('/groups', function(req,res) {
 apiRoutes.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){
         //send response to client
+		console.log(req.body.type);
+		var dir = path.join(__dirname,config.multer.path,req.body.type);
+		console.log(dir);
         if(err){
                 res.json({error_code:1,err_desc:err});
                 return;
@@ -137,7 +140,8 @@ apiRoutes.post('/InputFiles', function (req, res) {
         res.json({error_code:0,err_desc:null});
        
         //create new path and directory
-        var dir = path.join(__dirname,config.multer.path,req.body.type);
+        //var dir = path.join(__dirname,config.multer.path,req.body.type);
+		console.log(dir);
         if(!fs.existsSync(dir)){
              fs.mkdirSync(dir);
         }
@@ -170,7 +174,7 @@ app.post('/authenticate', function(req, res) {
 			res.json({ success: false, message: 'User not found.' });
 		} 
 		else {
-			console.log(user.pw + ' | ' + req.body.password);
+			
 			if (user.pw != req.body.password) {
 				res.json({ success: false, message: 'Wrong password.' });
 			} 

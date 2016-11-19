@@ -12,6 +12,9 @@ var setJobStatus = function(jobs,path,status) {
     for(var i = 0; i < jobs.length; i++) {
         cur = jobs[i];
         if(cur.path === path) {
+            if(status == config.status.ACTIVE) {
+                //console.log('setting : ' + path + ' to Active');
+            }
             jobs[i].status = status;
             break;
         }
@@ -21,7 +24,7 @@ var setJobStatus = function(jobs,path,status) {
 var getNextJob = function(jobs) {
     for(var i = 0; i < jobs.length; i++) {
         cur = jobs[i];
-        if(cur.status != config.status.ACTIVE && cur.status != config.status.COMPLETE) {
+        if(cur.status == config.status.INCOMPLETE) {
             return cur;
         }
     }

@@ -1,6 +1,8 @@
 app.controller('groupsController', ['$location', '$route', '$scope','$http','$localStorage', function($location,$route,$scope, $http, $localStorage) {
     closeModal = function(id) {
     	$(id).modal('hide');
+		$('.modal').removeClass('show');
+
     }
     var token = $localStorage.currentUser.token
     

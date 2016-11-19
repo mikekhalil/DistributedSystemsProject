@@ -31,6 +31,7 @@ socket.on('UploadedFile', function(file) {
 
     if(resourceManager.isInitialized(setup)) {
         //set up job table
+        console.log("IS SET UP - NOW STARTING");
         messenger.publishTo("worker", "MapReduce", {mapper : setup.map, reducer : setup.reduce });
         messenger.publishTo("reducer", "MapReduce", {reducer : setup.reduce });
         Object.keys(setup.data).forEach(function(key) {
@@ -41,8 +42,9 @@ socket.on('UploadedFile', function(file) {
             var worker = workers[i]; 
             var split = setup.data[i];
             if(split != undefined) {
-                console.log(worker);
-                messenger.publishToSelectedWorkers([worker],"InputSplit", {fileData : fs.readFileSync(setup.data[i],"utf8"), inputSplit : setup.data[i]});
+                //console.log(worker);
+                JobManager.setJobStatus(jobTable, split, config.status.ACTIVE);
+                messenger.publishToSelectedWorkers([worker],"InputSplit", {fileData : fs.readFileSync(split,"utf8"), inputSplit : split});
             }
         }
     }
@@ -58,10 +60,11 @@ messenger.inchannel.subscribe("Results", function(msg) {
     var completedJob = msg.data.inputSplit;
     JobManager.setJobStatus(jobTable,completedJob,config.status.COMPLETE);
     var job = JobManager.getNextJob(jobTable);
-    JobManager.setJobStatus(jobTable,job,config.status.ACTIVE);
-    var workers = messenger.getIdleWorkers();
+    if(job)
+        JobManager.setJobStatus(jobTable,job.path,config.status.ACTIVE);
     if (job != null) {
         //still has to go to vork
+        //console.log('got results for ' + job.path);
         messenger.publishToSelectedWorkers([sockid], "InputSplit", {fileData : fs.readFileSync(job.path,"utf8"), inputSplit : job.path})
     }
 });

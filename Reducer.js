@@ -8,42 +8,25 @@ var redis = require('redis');
 var RedisClient = redis.createClient(6379,"198.199.123.85"); //creates a new client
 
 
+//TODO (jobid and groupid will need to be in packet data now) as well as count + length
+var JobTracker = {
+	test  : {
+		count: 0,
+		length: 150
+	}
+};
+
 RedisClient.on('connect', function() {
 	RedisClient.auth(config.redis.password, function(err) {
 		console.log('connected to Redis');
 		RedisClient.flushdb(function(err,suc) {
 			if(err)
 				console.log(err);
-
 			console.log('cleared Redis');
 		});
 		
 	});
 });
-
-
-
-reduceFunc = null;
-socket.on('connect', function() { 
-	MongoClient.connect(config.mongodb.url, function(err,db) {
-		if(!err) {
-			console.log("clearing mongo collection");
-			reducer.clearCollection(db,"jobs", reducer.closeConnection);
-			console.log('cleared collection');
-		}
-		else{
-			console.log(err);
-			reducer.closeConnection(db);
-		}
-		
-	});	
-}); 
-
-messenger.inchannel.subscribe(config.topics.SYSTEM_RESET , function(msg) {
-	//do stuff to reset reducer / particular collection
-	
-
-}); 
 
 messenger.inchannel.subscribe("MapReduce", function(msg) {
     reduceFunc = new Function('key','value',msg.data.reducer);
@@ -51,27 +34,18 @@ messenger.inchannel.subscribe("MapReduce", function(msg) {
 
 
 messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
-	//slave node finish MapReduce job 
-	/*MongoClient.connect(config.mongodb.url, function(err, db) {
-		if(!err){
-			reducer.reduce(db,"jobs", msg.data, reduceFunc, reducer.closeConnection);
-		}
-		else {
-			console.log(err);
-			reducer.closeConnection(db);
-		}
-		
-	});*/
-	
-			
-		reducer.redisReduce(RedisClient,"groupid", msg.data, reduceFunc);
-	
-
-
-
-
-
-	
+		//get job id from message
+		//var job_id = msg.data.job_id
+		var job_id = 'test';
+		reducer.redisReduce(RedisClient,"groupid", msg.data, reduceFunc, function() {
+			JobTracker[job_id].count += 1;
+			console.log('count: ' + JobTracker[job_id].count);
+			if(JobTracker[job_id].count === JobTracker[job_id].length) {
+			 	console.log('completed entire job');
+			 	//TODO : DUMP TO TEXT FILE THEN UPDATE STUFF
+				//CLEANUP REDIS 
+			}
+		});
 });
 
 

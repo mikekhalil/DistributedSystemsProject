@@ -7,17 +7,16 @@ const path = require('path');
 const resourceManager = require(__dirname + '/modules/ClientManager.js');
 const JobManager = require(__dirname + '/modules/JobFactory.js');
 
+//TODO MAP Group ID's to sockIDS in client table
 
 //Job Object : { inputSplit (primary key - string - path), status (string), worker (socketid - foreign key)}
 var jobTable = [];
 
 //TODO: Create setup table (also write to db) to know when to start job for a particular group
-//Also create button to start / restart a job
 var setup = {map : null, reduce : null, data : null }
 
 
-//TODO:
-//set up a method that allows new clients that just connected to start comoputing all of the jobs that thare are part of
+//TODO: set up a method that allows new clients that just connected to start comoputing all of the jobs that thare are part of
 
 
 //use client table and job table to assign jobs based off availability
@@ -45,6 +44,7 @@ socket.on('UploadedFile', function(file) {
              jobTable.push(JobManager.createJob(setup.data[key], config.status.INCOMPLETE));
         });
         var workers = messenger.getIdleWorkers();
+        console.log('number of splits ' + Object.keys(setup.data).length);
         for(var i = 0; i < workers.length; i++) {
             var worker = workers[i]; 
             var split = setup.data[i];
@@ -77,7 +77,7 @@ messenger.inchannel.subscribe("Results", function(msg) {
     }
 });
 
-//console.log(config.topics.CLIENT_TABLE_UPDATE);
 messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {
-    console.log('hello wolrd\n');
+    //TODO Create actual JobManager Datastrucutre
+    //TODO Create Group manager data structurez
 })

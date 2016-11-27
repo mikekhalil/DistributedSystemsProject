@@ -152,7 +152,13 @@ apiRoutes.get('/user', function(req, res) {
 });   
 
 apiRoutes.get('/group', function(req,res) {
+	//TODO
+});
 
+
+apiRoutes.post('/joinGroup', function(req,res) {
+	//TODO join group 
+	
 });
 
 app.post('/authenticate', function(req, res) {

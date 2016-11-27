@@ -41,7 +41,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
     });
     
     
-
+    //TODO CREATE progress bar?
     $scope.upload = function (files, log, type) {
         if (files && files.length) {
             for (var i = 0; i < files.length; i++) {

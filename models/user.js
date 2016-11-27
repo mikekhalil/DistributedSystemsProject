@@ -5,8 +5,7 @@ module.exports = mongoose.model('User', new Schema({
     data : {
         email: String,
         name: String,
-        groups: [String],     
-        jobs: [String]
+        groups: [String]
     },
     pw: String 
 }));

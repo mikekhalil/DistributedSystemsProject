@@ -8,13 +8,15 @@ var createJob = function(path, status) {
     return job;
 }
 
+//TODO: Write Job Table to Database
+
+
+
+//TODO: TIME OUT FEATURE - attach time stamp when status == ACTIVE
 var setJobStatus = function(jobs,path,status) {
     for(var i = 0; i < jobs.length; i++) {
         cur = jobs[i];
         if(cur.path === path) {
-            if(status == config.status.ACTIVE) {
-                //console.log('setting : ' + path + ' to Active');
-            }
             jobs[i].status = status;
             break;
         }

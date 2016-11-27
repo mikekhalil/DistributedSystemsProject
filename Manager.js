@@ -10,7 +10,15 @@ const JobManager = require(__dirname + '/modules/JobFactory.js');
 
 //Job Object : { inputSplit (primary key - string - path), status (string), worker (socketid - foreign key)}
 var jobTable = [];
+
+//TODO: Create setup table (also write to db) to know when to start job for a particular group
+//Also create button to start / restart a job
 var setup = {map : null, reduce : null, data : null }
+
+
+//TODO:
+//set up a method that allows new clients that just connected to start comoputing all of the jobs that thare are part of
+
 
 //use client table and job table to assign jobs based off availability
 socket.on('UploadedFile', function(file) {
@@ -31,7 +39,6 @@ socket.on('UploadedFile', function(file) {
 
     if(resourceManager.isInitialized(setup)) {
         //set up job table
-        console.log("IS SET UP - NOW STARTING");
         messenger.publishTo("worker", "MapReduce", {mapper : setup.map, reducer : setup.reduce });
         messenger.publishTo("reducer", "MapReduce", {reducer : setup.reduce });
         Object.keys(setup.data).forEach(function(key) {
@@ -42,7 +49,6 @@ socket.on('UploadedFile', function(file) {
             var worker = workers[i]; 
             var split = setup.data[i];
             if(split != undefined) {
-                //console.log(worker);
                 JobManager.setJobStatus(jobTable, split, config.status.ACTIVE);
                 messenger.publishToSelectedWorkers([worker],"InputSplit", {fileData : fs.readFileSync(split,"utf8"), inputSplit : split});
             }
@@ -60,16 +66,18 @@ messenger.inchannel.subscribe("Results", function(msg) {
     var completedJob = msg.data.inputSplit;
     JobManager.setJobStatus(jobTable,completedJob,config.status.COMPLETE);
     var job = JobManager.getNextJob(jobTable);
+    
+    //TODO: Add a timeout featue - if job has been active for more tha X seconds, update it to not active - assign job to another node
     if(job)
         JobManager.setJobStatus(jobTable,job.path,config.status.ACTIVE);
+
     if (job != null) {
         //still has to go to vork
-        //console.log('got results for ' + job.path);
         messenger.publishToSelectedWorkers([sockid], "InputSplit", {fileData : fs.readFileSync(job.path,"utf8"), inputSplit : job.path})
     }
 });
 
 //console.log(config.topics.CLIENT_TABLE_UPDATE);
 messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {
-    //console.log(msg);
+    console.log('hello wolrd\n');
 })

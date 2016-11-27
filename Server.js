@@ -41,14 +41,14 @@ app.get('/', function (req, res) {
 
 //API
 app.use('/api', apiRoutes);
+
+
+//middleware to verify tokens 
 apiRoutes.use(function(req, res, next) {
-	//console.log(req.headers);
-	// check header or url parameters or post parameters for token
 	var token = req.body.token || req.query.token || req.headers['x-access-token'];
-	//console.log('token : ' + token);
+
 	// decode token
 	if (token) {
-		
 		// verifies secret and checks exp
 		jwt.verify(token, app.get('secret'), function(err, decoded) {      
 		if (err) {
@@ -64,8 +64,6 @@ apiRoutes.use(function(req, res, next) {
 
 	} 
 	else {
-		// if there is no token
-		// return an error
 		return res.status(403).send({ 
 			success: false, 
 			message: 'No token provided.' 
@@ -75,10 +73,8 @@ apiRoutes.use(function(req, res, next) {
 
 
 apiRoutes.post('/registerGroup', function(req,res) {
-	console.log('ay');
 	var user = req.decoded._doc.data;
 	var name = req.body.name;
-	console.log(user);
 	var newGroup = new Group({
 		users : [user.email],
 		admins : [user.email],
@@ -130,22 +126,19 @@ apiRoutes.get('/groups', function(req,res) {
 apiRoutes.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){
         //send response to client
-		console.log(req.body.type);
 		var dir = path.join(__dirname,config.multer.path,req.body.type);
-		console.log(dir);
+		if(!fs.existsSync(dir)){
+             fs.mkdirSync(dir);
+        }
+
         if(err){
                 res.json({error_code:1,err_desc:err});
                 return;
         }
+
         res.json({error_code:0,err_desc:null});
-       
-        //create new path and directory
-        //var dir = path.join(__dirname,config.multer.path,req.body.type);
-		console.log(dir);
-        if(!fs.existsSync(dir)){
-             fs.mkdirSync(dir);
-        }
         fs.renameSync(req.file.path,path.join(dir, req.file.filename));
+
 
 		//just send path to data file
 		var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
@@ -181,7 +174,7 @@ app.post('/authenticate', function(req, res) {
 			else {
 				// create a token
 				var token = jwt.sign(user, app.get('secret'), {
-					expiresIn: 60 * 60 * 24 // expires in 24 hours
+					expiresIn: 60 * 60 * 24 * 10 // expires in 10 days
 				});
 
 				//send token
@@ -275,7 +268,6 @@ function registerClient(socket, msg) {
 			role: msg.sender
 		});
 	io.emit('clientTabUpdate' , ClientTab);
-    //console.log(ClientTab); 
 }
 
 

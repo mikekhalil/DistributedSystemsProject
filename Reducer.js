@@ -4,10 +4,27 @@ var MongoClient = require('mongodb').MongoClient;
 var config = require('./config.json');
 var reducer = require(__dirname + '/modules/Reducer.js');
 
+var redis = require('redis');
+var RedisClient = redis.createClient(6379,"198.199.123.85"); //creates a new client
+
+
+RedisClient.on('connect', function() {
+	RedisClient.auth(config.redis.password, function(err) {
+		console.log('connected to Redis');
+		RedisClient.flushdb(function(err,suc) {
+			if(err)
+				console.log(err);
+
+			console.log('cleared Redis');
+		});
+		
+	});
+});
+
+
 
 reduceFunc = null;
 socket.on('connect', function() { 
-	console.log("connected to socket server");
 	MongoClient.connect(config.mongodb.url, function(err,db) {
 		if(!err) {
 			console.log("clearing mongo collection");
@@ -34,11 +51,9 @@ messenger.inchannel.subscribe("MapReduce", function(msg) {
 
 
 messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
-	//slave node finish MapReduce job
-	console.log("got results from nodes"); 
-	MongoClient.connect(config.mongodb.url, function(err, db) {
+	//slave node finish MapReduce job 
+	/*MongoClient.connect(config.mongodb.url, function(err, db) {
 		if(!err){
-			console.log("Got Results - Storing in mongodb");
 			reducer.reduce(db,"jobs", msg.data, reduceFunc, reducer.closeConnection);
 		}
 		else {
@@ -46,7 +61,15 @@ messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
 			reducer.closeConnection(db);
 		}
 		
-	});
+	});*/
+	
+			
+		reducer.redisReduce(RedisClient,"groupid", msg.data, reduceFunc);
+	
+
+
+
+
 
 	
 });

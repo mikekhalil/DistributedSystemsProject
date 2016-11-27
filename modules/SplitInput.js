@@ -22,7 +22,7 @@ var func = function SplitInput(file, splitDir, callback) {
     var splits = {};        /* store file path of splits */
     var splitCount = 0;     /* number of splits			 */
     var filepath = '';      /* full path of split		 */
-    const splitSize = 64000; /* split size in bytes		 */
+    const splitSize = 16000; /* split size in bytes		 */
 
     if (!fs.existsSync(splitDir)) {
         fs.mkdirSync(splitDir);

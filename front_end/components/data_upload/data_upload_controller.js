@@ -1,11 +1,14 @@
-app.controller('uploadController', ['$scope','Upload','$timeout', function($scope,Upload,$timeout) {
+app.controller('uploadController', ['$scope','Upload','$timeout','$location','$localStorage', function($scope,Upload,$timeout,$location,$localStorage) {
     $scope.cream = "This is the value of cream";
-    
+    $scope.isActive = function(route) {
+        console.log('activity changed');
+        return $location.path().includes(route);
+    }
     $scope.dataLog = '';
     $scope.mapLog = '';
     $scope.reduceLog = '';
     
-    
+    var token = $localStorage.currentUser.token
     
     $scope.$watch('dataFiles', function () {
         $scope.upload($scope.dataFiles,'dataLog', "data");
@@ -38,18 +41,19 @@ app.controller('uploadController', ['$scope','Upload','$timeout', function($scop
     });
     
     
-
+    //TODO CREATE progress bar?
     $scope.upload = function (files, log, type) {
         if (files && files.length) {
             for (var i = 0; i < files.length; i++) {
               var file = files[i];
               if (!file.$error) {
                 Upload.upload({
-                    url: 'http://localhost:8080/InputFiles/',
+                    url: 'http://localhost:8080/api/InputFiles/',
                     data: {
                       file: file,
                       type : type 
-                    }
+                    },
+                    headers : {'x-access-token' : token }
                 }).then(function (resp) {
                     $timeout(function() {
                         $scope[log] = 'file: ' +

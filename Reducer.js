@@ -4,54 +4,52 @@ var MongoClient = require('mongodb').MongoClient;
 var config = require('./config.json');
 var reducer = require(__dirname + '/modules/Reducer.js');
 
+var redis = require('redis');
+var RedisClient = redis.createClient(6379,"198.199.123.85"); //creates a new client
 
-reduceFunc = null;
-socket.on('connect', function() { 
-	console.log("connected to socket server");
-	MongoClient.connect(config.mongodb.url, function(err,db) {
-		if(!err) {
-			console.log("clearing mongo collection");
-			reducer.clearCollection(db,"jobs", reducer.closeConnection);
-			console.log('cleared collection');
-		}
-		else{
-			console.log(err);
-			reducer.closeConnection(db);
-		}
+
+//TODO (jobid and groupid will need to be in packet data now) as well as count + length
+var JobTracker = {
+	test  : {
+		count: 0,
+		length: 150
+	}
+};
+
+RedisClient.on('connect', function() {
+	RedisClient.auth(config.redis.password, function(err) {
+		console.log('connected to Redis');
+		RedisClient.flushdb(function(err,suc) {
+			if(err)
+				console.log(err);
+			console.log('cleared Redis');
+		});
 		
-	});	
-}); 
+	});
+});
 
-messenger.inchannel.subscribe(config.topics.SYSTEM_RESET , function(msg) {
-	//do stuff to reset reducer / particular collection
-	
-
-}); 
+RedisClient.on('error', function(err) {
+	console.log(err);
+});
 
 messenger.inchannel.subscribe("MapReduce", function(msg) {
-	console.log(msg.data);
     reduceFunc = new Function('key','value',msg.data.reducer);
 });
 
 
 messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
-	//slave node finish MapReduce job
-	console.log("got results from nodes"); 
-	MongoClient.connect(config.mongodb.url, function(err, db) {
-		//console.log(msg.data);
-		if(!err){
-			console.log("Got Results - Storing in mongodb");
-			//console.log(msg.data);
-			reducer.reduce(db,"jobs", msg.data, reduceFunc, reducer.closeConnection);
-		}
-		else {
-			console.log(err);
-			reducer.closeConnection(db);
-		}
-		
-	});
-
-	
+		//get job id from message
+		//var job_id = msg.data.job_id
+		var job_id = 'test';
+		reducer.redisReduce(RedisClient,"groupid", msg.data, reduceFunc, function() {
+			JobTracker[job_id].count += 1;
+			console.log('count: ' + JobTracker[job_id].count);
+			if(JobTracker[job_id].count === JobTracker[job_id].length) {
+			 	console.log('completed entire job');
+			 	//TODO : DUMP TO TEXT FILE THEN UPDATE STUFF
+				//CLEANUP REDIS 
+			}
+		});
 });
 
 

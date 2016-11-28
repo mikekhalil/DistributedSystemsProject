@@ -1,0 +1,56 @@
+
+<style>
+body.modal-open div.modal-backdrop { 
+    z-index: 0; 
+}
+</style>
+
+<div class="col-md-6 col-md-offset-3 green">
+    <h2>Login</h2>
+    <form  name="form" ng-submit="form.$valid && vm.login()" novalidate>
+        <div class="form-group form-success" ng-class="{ 'has-error': form.$submitted && form.username.$invalid }">
+            <input data-color="green" type="text" placeholder="Email" name="username" class="form-control" ng-model="username" required />
+            <div ng-messages="form.$submitted && form.username.$error" class="help-block">
+                <div ng-message="required">Email is required</div>
+            </div>
+        </div>
+        <div data-color="green" class="form-success form-group" ng-class="{ 'has-error': form.$submitted && form.password.$invalid }">
+            <input placeholder="Password" type="password" name="password" class="form-control" ng-model="password" required />
+            <div ng-messages="form.$submitted && form.password.$error" class="help-block">
+                <div ng-message="required">Password is required</div>
+            </div>
+        </div>
+        
+          <a ng-href="#" data-toggle="modal" data-target="#regModal"><br> <p style="color : green;">Don't have an account? Sign up!</p> </a>
+        <div class="form-group">
+            <button data-color="green" ng-disabled="vm.loading" class="btn btn-success" ng-click="login()">Login</button>
+        </div>
+        <div ng-if="error" class="alert alert-danger">{{error}}</div>
+        
+    </form>
+
+    <!-- Registration Modal -->
+    <div class="modal fade" id="regModal" tabindex="-1" role="dialog" aria-labelledby="myRegLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myRegLabel">Create an account</h4>
+      </div>
+      <div class="modal-body">
+      <p>Username<br> <input type="text" ng-model="registerName" value=""></p>
+      <p> Email<br> <input type="text" ng-model="registerEmail" value=""></p>
+       <p>  Password<br> <input type="password" ng-model="registerPassword" value=""></p>
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button ng-click="createUser()" type="button" class="btn btn-success">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+  
+</div>

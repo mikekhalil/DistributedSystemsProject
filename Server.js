@@ -9,46 +9,258 @@ var http = require('http');
 var server = http.createServer(app);  
 var io = require('socket.io').listen(server);
 var postal = require('postal');
+var bodyParser  = require('body-parser');
+var morgan      = require('morgan');
+var mongoose    = require('mongoose');
+var jwt    = require('jsonwebtoken'); 
+var User   = require(__dirname + '/models/user'); // get our mongoose model
+var Group = require(__dirname + '/models/group');
+var _  = require("lodash"); 
+    
 
 /*globals*/
 var ClientTab = []; 
 
+var apiRoutes = express.Router(); 
 app.use(express.static(__dirname + '/front_end'));
+mongoose.connect(config.mongodb.url);
 
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/front_end/index.html');
-});
+app.use(morgan('dev'));
+
+app.set('secret', config.secret); 	//TODO make this a random secret for production
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 
 
 server.listen(8080); 
 
-app.post('/InputFiles', function (req, res) {
+//angular app
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/front_end/index.html');
+});
+
+//API
+app.use('/api', apiRoutes);
+
+
+//middleware to verify tokens 
+apiRoutes.use(function(req, res, next) {
+	var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+	// decode token
+	if (token) {
+		// verifies secret and checks exp
+		jwt.verify(token, app.get('secret'), function(err, decoded) {      
+		if (err) {
+			console.log('couldnt verify token');
+			return res.json({ success: false, error : err});    
+		} 
+		else {
+			// if everything is good, save to request for use in other routes
+			req.decoded = decoded;    
+			next();
+		}
+	});
+
+	} 
+	else {
+		return res.status(403).send({ 
+			success: false, 
+			message: 'No token provided.' 
+		});
+	}
+});
+
+
+apiRoutes.post('/registerGroup', function(req,res) {
+	var user = req.decoded._doc.data;
+	var name = req.body.name;
+	var newGroup = new Group({
+		users : [user.email],
+		admins : [user.email],
+		name : name,
+		jobs : []
+	});
+	
+	newGroup.save(function(err) {
+		if(err) {
+			console.log(err);
+			res.json({success : false, error : err});
+		}
+		res.json({success : true });
+	});
+
+	User.findOne({'data.email': user.email}, function(err, doc) {
+			doc.data.groups.push(name);
+			doc.save();
+	});
+
+
+})
+
+
+app.post('/registerUser', function(req,res) {
+	var data = req.body;
+	var newUser = new User({ 
+		data : {
+			name: data.name, 
+			email: data.email
+		},
+		pw: data.pw
+	});
+
+	// save the new user
+	newUser.save(function(err) {
+		if (err) {
+			console.log(err);
+			res.json({success: false, error : err});
+		}
+		res.json({ success: true });
+  	});
+});
+
+apiRoutes.get('/groups', function(req,res) {
+	Group.find({}, function(err, groups) {
+		if(err){
+			console.log(err);
+			res.json({success : false, error : err});
+		}
+		res.json({success : true, groups : groups});
+	});
+
+});
+
+apiRoutes.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){
         //send response to client
+		var dir = path.join(__dirname,config.multer.path,req.body.type);
+		if(!fs.existsSync(dir)){
+             fs.mkdirSync(dir);
+        }
+
         if(err){
                 res.json({error_code:1,err_desc:err});
                 return;
         }
+
         res.json({error_code:0,err_desc:null});
-       
-        //create new path and directory
-        var dir = path.join(__dirname,config.multer.path,req.body.type);
-        if(!fs.existsSync(dir)){
-             fs.mkdirSync(dir);
-        }
         fs.renameSync(req.file.path,path.join(dir, req.file.filename));
+
 
 		//just send path to data file
 		var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
 		io.emit('UploadedFile', payload);
-		
     })
 });
 
 
+apiRoutes.get('/user', function(req, res) {
+	var email = req.decoded._doc.data.email;
+	User.findOne({'data.email' : email }, function(err,doc) {
+		if(!err)
+			res.json(doc.data);
+	});
+});   
+
+apiRoutes.get('/group', function(req,res) {
+	//TODO
+});
+
+
+apiRoutes.post('/joinGroup', function(req,res) {
+	//TODO join group 
+	//update user and group documents
+	var user = req.decoded._doc.data;
+	var data = req.body;
+	var sent = false;
+	var result = {
+		'group' : null,
+		'user' : null
+	}
+
+	//update user and group documents
+	Group.findOne({name: data.group}, function(err,doc) {
+		var users = doc.users;
+		if(users.indexOf(user.email) > -1) {
+			console.log("already in group");
+			result.group = {success:false, error: "already in group"};
+		}
+		else {
+			doc.users.push(user.email);
+			doc.save();
+			result.group = {success:true};
+		}
+
+		//check to see if we need to send response
+		if(sent == false && result.user != null) {
+			res.json(result);
+			sent = true;
+		}
+	});
+
+	User.findOne({'data.email': user.email}, function(err, doc) {
+		var groups = doc.data.groups;
+		if(groups.indexOf(data.group) > -1){
+			console.log("already in group");
+			result.user = {success: false, error: "already in group"};
+		}
+		else{
+			//save group to user
+			doc.data.groups.push(data.group);
+			doc.save();
+			result.user = {success:true};
+		}
+
+		//check to see if we need to send response
+		if(sent == false && result.group != null) {
+			res.json(result);
+			sent = true;
+		}
+	});
+	
+});
+
+app.post('/authenticate', function(req, res) {
+	// find the user
+	console.log(req.body);
+	
+	User.findOne({'data.email' : req.body.email}, function(err, user) {
+		if (err) 
+			throw err;
+
+		if (!user) {
+			res.json({ success: false, message: 'User not found.' });
+		} 
+		else {
+			
+			if (user.pw != req.body.password) {
+				res.json({ success: false, message: 'Wrong password.' });
+			} 
+			else {
+				// create a token
+				var token = jwt.sign(user, app.get('secret'), {
+					expiresIn: 60 * 60 * 24 * 10 // expires in 10 days
+				});
+
+				//send token
+				res.json({
+					success: true,
+					token: token
+				});
+			}   
+		}
+
+  	});
+});
+
+
+
+
+//socket server stuff
 io.on('connection', function(socket) {
 	
-	console.log('a client connected');
+	//console.log('a client connected');
 	io.emit('clientTabUpdate' , ClientTab); 
 
 	socket.on('register', function (msg) {
@@ -62,16 +274,15 @@ io.on('connection', function(socket) {
 	}); 
 	socket.on('worker', function (msg) {
 		var recip = msg.id;
-		console.log('recipients\n=-=-=-=\n'); 
-		console.log(recip);
+		//console.log(recip);
 		if (recip != null ) {
 			for (x in recip) {
-				console.log("relay to " + msg.id[x]); 
+				//console.log("relay to " + msg.id[x]); 
 				io.to(msg.id[x]).emit("worker", msg);	
 			}
 		}
 		else {
-			console.log("CREAM");
+			//console.log("CREAM");
 			io.emit('worker', msg); 
 		}
 	});
@@ -81,8 +292,8 @@ io.on('connection', function(socket) {
 				ClientTab.splice(x,1); 
 			}
 		}
-		console.log('A client disconnected'); 
-		console.log(ClientTab); 
+		// console.log('A client disconnected'); 
+		// console.log(ClientTab); 
 		io.emit('clientTabUpdate' , ClientTab);
 	}); 
 	socket.on('server', function (msg){
@@ -123,7 +334,6 @@ function registerClient(socket, msg) {
 			role: msg.sender
 		});
 	io.emit('clientTabUpdate' , ClientTab);
-    console.log(ClientTab); 
 }
 
 

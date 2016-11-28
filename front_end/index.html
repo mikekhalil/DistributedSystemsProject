@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script   src="http://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
-        <!-- Compiled and minified CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
-
-        <!-- Compiled and minified JavaScript -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
-
-        <!--angular -->
+        <!-- angular + jquery -->
+        <script src="http://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-route.min.js"></script>
         <script src="assets/libs/ng-file-upload.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.6/ngStorage.min.js"></script>
         <script src="assets/js/app.js"></script>
+     
 
         <!-- postal / socket.io / messenger requirements -->
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://cdn.jsdelivr.net/lodash/4.16.1/lodash.js"></script>
         <script src="assets/js/ClientMessenger/postal.js"></script>
         <script src="assets/js/ClientMessenger/ClientMessenger.js"></script>
+
+        <!-- UI Controllers -->
+        <script src="components/dashboard/dashboard_controller.js"></script>
+        <script src="components/login/AuthenticationService.js"></script>
+        <script src="components/login/login_controler.js"></script>
+        <script src="components/nav/nav_controller.js"></script> 
+        <script src="components/groups/groups_controller.js"></script> 
+        <script src="components/profile/profile_controller.js"></script> 
         
         <!-- MapReduce -->
         <script src="components/data_upload/data_upload_controller.js"></script>
@@ -26,9 +30,86 @@
         <script src="assets/js/Reducer/Reducer.js"></script>
         <script src="assets/js/Mapper/Mapper.js"></script>
         <script src="assets/js/Main.js"></script>
+
+        <!-- dashboard theme -->
+        <link href="assets/vendor/bootstrap.min.css" rel="stylesheet" />
+        <link href="assets/vendor/material-dashboard.css" rel="stylesheet"/>
+        <link href="assets/vendor/demo.css" rel="stylesheet" />
+        <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+        <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300|Material+Icons' rel='stylesheet' type='text/css'>
+      
         
     </head>
     <body ng-app="cream">
-      <div ng-view></div>
+        <div class="wrapper">
+            <div class="sidebar" ng-controller="navController" data-color="green" data-image="assets/img/sidebar-1.jpg">
+                <div class="logo">
+                    <a ng-href="#/" class="simple-text">
+                        {{ _user.username || "Welcome"}}
+                    </a>
+                </div>
+
+                <div class="sidebar-wrapper">
+                    <ul class="nav">
+                        <li id="dash_option" ng-class="{active:isActive('/dashboard')}">
+                            <a ng-href="#/">
+                                <i class="material-icons">dashboard</i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+                        <li ng-class="{active:isActive('/upload')}">
+                            <a id="upload_option" ng-href="#/upload">
+                                <i class="material-icons">library_books</i>
+                                <p>Jobs</p>
+                            </a>
+                        </li>
+                        <li ng-class="{active:isActive('/groups')}">
+                            <a ng-href="#/groups">
+                                <i class="material-icons">group_work</i>
+                                <p>Groups</p>
+                            </a>
+                        </li>
+                        <li ng-class="{active:isActive('/profile')}">
+                            <a ng-href="#/profile">
+                                <i class="material-icons">person</i>
+                                <p>Profile</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a ng-click="logout()" ng-href="#/">
+                                <i class="material-icons">launch</i>
+                                <p> Log out </p></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+	        <div class="main-panel">
+			    <nav class="navbar navbar-transparent navbar-absolute">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+					</div>
+			    </nav> 
+                <div class="container-fluid">
+                    <div ng-view></div>
+          
+                </div>
+           </div>
+        </div>
     </body>
+
+    <!--   Core JS Files   -->
+	<script src="assets/vendor/bootstrap.min.js" type="text/javascript"></script>
+	<script src="assets/vendor/material.min.js" type="text/javascript"></script>
+	<script src="assets/vendor/chartist.min.js"></script>
+	<script src="/assets/vendor/bootstrap-notify.js"></script>
+	<script src="assets/vendor/material-dashboard.js"></script>
+	<script src="/assets/vendor/demo.js"></script>
+     
 </html>

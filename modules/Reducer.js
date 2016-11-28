@@ -1,34 +1,22 @@
-var MainReduction = function(db,collection,result, redFunc,cb){
-	var col = db.collection(collection);
-	console.log('started reducing');
-    Object.keys(result).forEach(function(key) {
 
-		col.insert({_id:key}, {'value': result[key]}, function(err, doc){
-			if(err) {
-				col.update({_id:key}, {$inc: {'value':result[key]}});
-			}
-		});
-	
+var redisReduce = function(client, groupid, results, reduceFunc, cb) { 
+	var len = Object.keys(results).length;
+	var count = 0;
 
+	Object.keys(results).forEach(function(key) {
+		 var fullKey = groupid + ":" + key;
+		 client.incrby(fullKey,results[key],function(err,val){
+			 count += 1;
+			 if (count == len) {
+				 cb();
+			 }
+			
+		 });
 	});
-}
-
-var clearCollection = function(db, col, cb) {
-    var collection = db.collection(col);
-    collection.remove();
-    //db.close();
-    
-}
-
-var closeDB = function(db) {
-	console.log('closing db connection');
-	//db.close();
 }
 
 
 
 module.exports = {
-    reduce : MainReduction,
-    closeConnection : closeDB,
-    clearCollection : clearCollection
+	redisReduce: redisReduce
 }

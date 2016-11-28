@@ -1,7 +1,7 @@
 var mapper = null;
 var reducer = null;
 messenger.inchannel.subscribe("MapReduce", function(packet) {
-    console.log('map reduce ayy');
+    console.log('Job started');
     mapper = new Function('key', 'value',packet.data.mapper);
     reducer = new Function('key','value',packet.data.reducer);
 });

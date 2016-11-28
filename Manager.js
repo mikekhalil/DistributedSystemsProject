@@ -7,17 +7,22 @@ const path = require('path');
 const resourceManager = require(__dirname + '/modules/ClientManager.js');
 const JobManager = require(__dirname + '/modules/JobFactory.js');
 
+//TODO MAP Group ID's to sockIDS in client table
 
 //Job Object : { inputSplit (primary key - string - path), status (string), worker (socketid - foreign key)}
 var jobTable = [];
+
+//TODO: Create setup table (also write to db) to know when to start job for a particular group
 var setup = {map : null, reduce : null, data : null }
 
-//use client table and job table to assign jobs based off availability
 
+//TODO: set up a method that allows new clients that just connected to start comoputing all of the jobs that thare are part of
+
+
+//use client table and job table to assign jobs based off availability
 socket.on('UploadedFile', function(file) {
     if( file.type === config.REDUCE || file.type === config.MAP ){
         var fileData = fs.readFileSync(file.data, "utf8");
-        //setup[file.type] = new Function(fileData);
         setup[file.type] = fileData;
     }
     else {
@@ -39,14 +44,13 @@ socket.on('UploadedFile', function(file) {
              jobTable.push(JobManager.createJob(setup.data[key], config.status.INCOMPLETE));
         });
         var workers = messenger.getIdleWorkers();
-        console.log(workers);
+        console.log('number of splits ' + Object.keys(setup.data).length);
         for(var i = 0; i < workers.length; i++) {
-            var worker = workers[i]; //time to go to vork
+            var worker = workers[i]; 
             var split = setup.data[i];
             if(split != undefined) {
-                console.log('actually time to go to vork');
-                console.log(worker);
-                messenger.publishToSelectedWorkers([worker],"InputSplit", {fileData : fs.readFileSync(setup.data[i],"utf8"), inputSplit : setup.data[i]});
+                JobManager.setJobStatus(jobTable, split, config.status.ACTIVE);
+                messenger.publishToSelectedWorkers([worker],"InputSplit", {fileData : fs.readFileSync(split,"utf8"), inputSplit : split});
             }
         }
     }
@@ -63,20 +67,20 @@ messenger.inchannel.subscribe("Results", function(msg) {
     JobManager.setJobStatus(jobTable,completedJob,config.status.COMPLETE);
     var job = JobManager.getNextJob(jobTable);
     JobManager.setJobStatus(jobTable,job,config.status.ACTIVE);
-   
     var workers = messenger.getIdleWorkers();
+    
+    //TODO: Add a timeout featue - if job has been active for more tha X seconds, update it to not active - assign job to another node
+    if(job)
+        JobManager.setJobStatus(jobTable,job.path,config.status.ACTIVE);
+
     if (job != null) {
         //still has to go to vork
          console.log(job.path);
         messenger.publishToSelectedWorkers([sockid], "InputSplit", {fileData : fs.readFileSync(job.path,"utf8"), inputSplit : job.path})
     }
-    else {
-        //complete all jobs
-        console.log('completed all jobs');
-    }
 });
 
-console.log(config.topics.CLIENT_TABLE_UPDATE);
 messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {
-    console.log(msg);
+    //TODO Create actual JobManager Datastrucutre
+    //TODO Create Group manager data structurez
 })

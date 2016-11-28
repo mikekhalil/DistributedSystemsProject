@@ -1,0 +1,17 @@
+<div class="container">
+    <h1> Profile </h1>
+    <h3> {{ cur.name }}
+    <h3> {{cur.email}} <h3> 
+
+    <table class="table table-hover">
+        <thead>
+            <tr> Groups </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="x in cur.groups">
+                <td>{{x}}</td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>

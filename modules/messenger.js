@@ -39,12 +39,15 @@ module.exports = function (socket, channelname){
 
 	/*route outgoing messages to socket.io server*/ 
 	module.outchannel.subscribe("outgoing", function (data) {
-		console.log("outgoing"); 
+		//console.log("outgoing"); 
 		socket.emit(data.reciever, data); 
     });
 	/*recieve incoming messages and re-establish original topic*/ 
     module.inchannel.subscribe("incoming", function (data) {
-    	console.log("incoming"); 
+    	//console.log("incoming"); 
+		// console.log(data.data.sockid);
+		// console.log(data.data.inputSplit);
+		// console.log('=-=-=-=-=-=-=-');
     	module.inchannel.publish(data.topic, data); 
     }); 
     /*publish array of sockids as recipients*/ 

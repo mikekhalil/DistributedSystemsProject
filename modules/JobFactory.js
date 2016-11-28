@@ -8,6 +8,11 @@ var createJob = function(path, status) {
     return job;
 }
 
+//TODO: Write Job Table to Database
+
+
+
+//TODO: TIME OUT FEATURE - attach time stamp when status == ACTIVE
 var setJobStatus = function(jobs,path,status) {
     for(var i = 0; i < jobs.length; i++) {
         cur = jobs[i];
@@ -19,11 +24,9 @@ var setJobStatus = function(jobs,path,status) {
 }
 
 var getNextJob = function(jobs) {
-    console.log('getting next job');
-    console.log(jobs.length);
     for(var i = 0; i < jobs.length; i++) {
         cur = jobs[i];
-        if(cur.status != config.status.ACTIVE && cur.status != config.status.COMPLETE) {
+        if(cur.status == config.status.INCOMPLETE) {
             return cur;
         }
     }

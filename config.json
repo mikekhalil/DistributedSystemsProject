@@ -11,6 +11,11 @@
     "mongodb" : {
         "url" : "mongodb://192.241.230.18:27017/cream"
     },
+    "redis":{
+        "host" : "",
+        "port" : "",
+        "password": "PotatoCream43" 
+    },
     "topics" : {
         "SYSTEM_RESET" : "SystemReset",
         "RESULTS" : "Results",
@@ -23,5 +28,6 @@
         "IDLE" : "idle",
         "ACTIVE" : "active",
         "COMPLETE" : "complete"
-    }
+    },
+    "secret" : "ilikepotatoes"
 }

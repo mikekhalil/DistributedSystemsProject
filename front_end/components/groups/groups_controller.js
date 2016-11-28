@@ -87,9 +87,7 @@ app.controller('groupsController', ['$rootScope','$location', '$route', '$scope'
 			console.log(rsp);
 		});
 	}
-	$scope.check = function() {
-		console.log('ay');
-	}
+
 	$scope.getUser();
 	$scope.getGroups();
 }]);

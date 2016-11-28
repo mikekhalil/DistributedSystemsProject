@@ -2,7 +2,9 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
         
         closeModal = function(id) {
             $(id).modal('hide');
+            $('.modal').removeClass('show');
         }
+        
         if($localStorage.currentUser){
             //already logged in, bring them to dashboard
             $location.path('/dashboard');
@@ -17,8 +19,6 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
                 })
                 .then(function(rsp) {
                     // success
-                
-                   
                     Authenticate($scope.registerEmail, $scope.registerPassword, function (result) {
                         console.log(result);
                         closeModal('#regModal');

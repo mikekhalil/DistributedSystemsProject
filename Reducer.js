@@ -28,6 +28,10 @@ RedisClient.on('connect', function() {
 	});
 });
 
+RedisClient.on('error', function(err) {
+	console.log(err);
+});
+
 messenger.inchannel.subscribe("MapReduce", function(msg) {
     reduceFunc = new Function('key','value',msg.data.reducer);
 });

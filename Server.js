@@ -15,6 +15,7 @@ var mongoose    = require('mongoose');
 var jwt    = require('jsonwebtoken'); 
 var User   = require(__dirname + '/models/user'); // get our mongoose model
 var Group = require(__dirname + '/models/group');
+var _  = require("lodash"); 
     
 
 /*globals*/
@@ -158,6 +159,54 @@ apiRoutes.get('/group', function(req,res) {
 
 apiRoutes.post('/joinGroup', function(req,res) {
 	//TODO join group 
+	//update user and group documents
+	var user = req.decoded._doc.data;
+	var data = req.body;
+	var sent = false;
+	var result = {
+		'group' : null,
+		'user' : null
+	}
+
+	//update user and group documents
+	Group.findOne({name: data.group}, function(err,doc) {
+		var users = doc.users;
+		if(users.indexOf(user.email) > -1) {
+			console.log("already in group");
+			result.group = {success:false, error: "already in group"};
+		}
+		else {
+			doc.users.push(user.email);
+			doc.save();
+			result.group = {success:true};
+		}
+
+		//check to see if we need to send response
+		if(sent == false && result.user != null) {
+			res.json(result);
+			sent = true;
+		}
+	});
+
+	User.findOne({'data.email': user.email}, function(err, doc) {
+		var groups = doc.data.groups;
+		if(groups.indexOf(data.group) > -1){
+			console.log("already in group");
+			result.user = {success: false, error: "already in group"};
+		}
+		else{
+			//save group to user
+			doc.data.groups.push(data.group);
+			doc.save();
+			result.user = {success:true};
+		}
+
+		//check to see if we need to send response
+		if(sent == false && result.group != null) {
+			res.json(result);
+			sent = true;
+		}
+	});
 	
 });
 

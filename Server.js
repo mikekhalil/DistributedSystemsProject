@@ -90,6 +90,13 @@ apiRoutes.post('/registerGroup', function(req,res) {
 		}
 		res.json({success : true });
 	});
+
+	User.findOne({'data.email': user.email}, function(err, doc) {
+			doc.data.groups.push(name);
+			doc.save();
+	});
+
+
 })
 
 
@@ -149,7 +156,11 @@ apiRoutes.post('/InputFiles', function (req, res) {
 
 
 apiRoutes.get('/user', function(req, res) {
-  res.json(req.decoded._doc.data);
+	var email = req.decoded._doc.data.email;
+	User.findOne({'data.email' : email }, function(err,doc) {
+		if(!err)
+			res.json(doc.data);
+	});
 });   
 
 apiRoutes.get('/group', function(req,res) {

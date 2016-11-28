@@ -16,10 +16,12 @@ body.modal-open div.modal-backdrop {
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="x in groups">
-        <td>{{x.name}}</td>
-         <td>{{x.numUsers}}</td>
-        <td>{{x.numJobs}}</td>
+      <tr ng-repeat="x in groups" ng-click="joinGroup(x.name)"ng-class="x.myGroups ? 'success' : 'danger'">
+          
+            <td>{{x.name}}</td>
+            <td>{{x.numUsers}}</td>
+            <td>{{x.numJobs}}</td>
+          
       </tr>
     </tbody>
   </table>

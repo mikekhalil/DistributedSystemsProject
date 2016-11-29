@@ -8,12 +8,12 @@ messenger.inchannel.subscribe("MapReduce", function(packet) {
 
 messenger.inchannel.subscribe("InputSplit", function(packet) {
     console.log('InputSplit');
-    console.log(packet);
+    //console.log(packet);
     var input = packet.data.fileData;
     var records = RecordReader(input, {type: "TextInputFormat"});
     var ShuffledData = Mapper( mapper, records );
     var ReducedData = Reducer( ShuffledData, reducer, null );
-    console.log(socket.io.engine.id);
+    //console.log(socket.io.engine.id);
     console.log('reduced data ');
     console.log(ReducedData);
    

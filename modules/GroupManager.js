@@ -1,46 +1,52 @@
+class GroupManager {
+    constructor(db){
+        this.jobs = {};
+        this.workers = {};
+        db.jobs.find({}, function(err,groups) {
+            if(err)
+                throw err;
+            console.log(groups);
+        });
+    }
 
-//Group Manager Object
-var jobs = {};
-var workers = {};
+    registerWorker(worker) {
+        for(var group of worker.groups)
+            this.workers[group.name].push(worker);
+    }
 
-var registerWorker = function(worker) {
-    var userGroups = worker.groups;
-    for(var i = 0; i < userGroups.length; i++) {
-        var currentGroup = userGroups[i].name;
-        this.workers[currentGroup].push(worker);
+    registerGroup(group) {
+        this.jobs[group.name] = group.jobs;
+        this.workers[group.name] = group.users;
+    }
+
+    registerJob(job, group_id) {
+        if(this.jobs[group_id].length == 0)
+            job.start();
+        this.jobs[group_id].push(job);
+    }
+
+    getJobs(group_id) {
+        return this.jobs[group_id];
+    }
+
+    getWorkers(group_id) {
+        return this.workers[group_id];
+    }
+
+    finishedJob(group_id) {
+        var job = this.jobs[group_id].shift(); //equivalent to dequeue
+    }
+
+    getNextJob(group_id) {
+        if(jobs[group_id] && jobs[group_id].length > 0)
+            return this.jobs[group_id][0];
+    }
+
+    hasNextJob(group_id) {
+         return this.getJobs(groupid) > 0;
+    }
+    
+    startJobs() {
+        //start jobs for each group on server start
     }
 }
-
-var registerGroup = function(group) {
-    this.jobs[group.name] = group.jobs;
-    this.workers[group.name] = group.users;
-}
-
-var registerJob = function(job,groupid) {
-    if(this.jobs[groupid].length == 0) {
-        //start job
-        job.start();
-    }
-    this.jobs[groupid].push(job);
-}
-
-var getJobs = function(groupid) {
-    return this.jobs[groupid];
-}
-
-var getWorkers  = function(groupid) {
-    return this.workers[groupid];
-}
-
-var finishedJob = function(groupid) {
-    return this.jobs[groupid].shift();
-}
-
-var getNextJob = function(groupid){
-    return this.jobs[groupid][0];
-}
-
-var hasNextJob = function(groupid) {
-    return this.getJobs(groupid) > 0;
-}
-

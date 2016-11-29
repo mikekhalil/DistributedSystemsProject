@@ -1,62 +1,75 @@
-//require mongoose and mongodb
 //require messenger
 
-var path;
-var status;
-var worker;
-var group;
-var map;
-var reduce;
-var splits;
-var tasks;
-var id;
+//TODO: Save job to database / do inputsplit / create tasks before the Job object is created
 
+//TODO: to make this a lot faster, keep track of current index of first non-complete job
+var TaskPacket = require('./TaskPacket.js');
+var InitialPacket = require('./InitialPacket.js');
+var config = require(__dirname + '/../config.json');
 
-var setStatus = function(status) {
-    this.status = status;
-} 
+class Job {
+    constructor(id, path, status, map, reduce,splits, group, messenger,GroupManager) {
+        this.id = id;
+        this.path = path;
+        this.status = status;
+        this.map = map;
+        this.reduce = reduce;
+        this.splits = splits;
+        this.group = group;
+        this.messenger = messenger;
+        this.GroupManager = GroupManager;
+        this.tasks = [];
+    }
+    setStatus(status) {
+        this.status = status;
+    }
+    start() {
+        this.setUpJob();
+        var workers = this.GroupManager.getWorkers(this.group);
+        this.printNumberOfTasks();
+        for(var worker of workers){
+            task = this.getNextTask();
+            if(task != undefined) {
+                task.setStatus(config.status.ACTIVE);
+                var packet = new TaskPacket(fs.readFileSync(task.split, "utf-8"), task.split, this.id, this.group);
+                this.messenger.publishToSelectedWorkers([worker],"InputSplit", jp);
+            }
+        }
 
-var setFile = function(file, type) {
-    this[type] = file;
-    //save to database
-    Jobs.findOne({name : this.name, group : group.name},function(err,doc) {
-        doc[type] = file;
-        doc.save();
-    });
-}
-
-var start = function() {
-    //set up job table
-    messenger.publishTo("worker", "MapReduce", {mapper : this.map, reducer : this.reduce, job_id : this.job.id , group_id : this.group });
-    messenger.publishTo("reducer", "MapReduce", {reducer : this.reduce , job_id : this.job.id, group_id : this.group });
-    Object.keys(this.splits).forEach(function(key) {
+    }
+    setUpJob(){
+        var packet = new InitialPacket(this.map,this.reduce,this.id,this.group);
+        this.messenger.publishTo("worker", "MapReduce", packet);
+        this.messenger.publishTo("reducer", "MapReduce", packet);
+         Object.keys(this.splits).forEach(function(key) {
             this.tasks.push(new Task(this.splits[key], config.status.INCOMPLETE));
-    });
-    var workers = GroupManager.getWorkers(this.group);
-    console.log('number of splits ' + Object.keys(this.splits).length);
-    for(var i = 0; i < workers.length; i++) {
-        var worker = workers[i]; 
-        var task = this.tasks[i];
-
-        if(task != undefined) {
+        });
+    }
+    printNumberOfTasks() {
+        console.log('number of tasks: ' + this.tasks.length);
+    }
+    resultHandler() {
+        //TODO: Add a timeout featue - if job has been active for more tha X seconds, update it to not active - assign job to another node
+        var sockid = msg.data.sockid;
+        var completedTask = msg.data.inputSplit;
+        completedTask.setStatus(config.status.COMPLETE);
+        var task = this.getNextTask();
+    
+        if (task != null) {
             task.setStatus(config.status.ACTIVE);
             var jp = new JobPacket(fs.readFileSync(task.split, "utf-8"), task.split, this.job.id, this.group);
-            messenger.publishToSelectedWorkers([worker],"InputSplit", jp);
+            messenger.publishToSelectedWorkers([sockid], "InputSplit", jp);
         }
     }
-
-}
-
-var resultHandler = function(msg) { 
-    //TODO: Add a timeout featue - if job has been active for more tha X seconds, update it to not active - assign job to another node
-    var sockid = msg.data.sockid;
-    var completedTask = msg.data.inputSplit;
-    completedTask.setStatus(config.status.COMPLETE);
-    var task = this.getNextTask();
-    
-    if (task != null) {
-        task.setStatus(config.status.ACTIVE);
-        var jp = new JobPacket(fs.readFileSync(task.split, "utf-8"), task.split, this.job.id, this.group);
-        messenger.publishToSelectedWorkers([sockid], "InputSplit", jp);
+    getNextTask(){
+        for(var cur of this.tasks) {
+            if(cur.status == config.status.INCOMPLETE) 
+                return cur;
+        }
+        return null;
+    }
+    isComplete() {
+        return getNextTask() != null;
     }
 }
+module.exports = Job;

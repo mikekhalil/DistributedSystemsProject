@@ -49,13 +49,13 @@ messenger.printConnections = function () {
 
 /*route outgoing messages to socket.io server*/ 
 messenger.outchannel.subscribe("outgoing", function (data) {
-	console.log("outgoing  traffic"); 
+	//console.log("outgoing  traffic"); 
 	socket.emit(data.reciever, data); 
 });
 		
 /*recieve incoming messages and re-establish original topic*/ 
 messenger.inchannel.subscribe("incoming", function (data) {
-	console.log("incoming traffic"); 
+	// console.log("incoming traffic"); 
     messenger.inchannel.publish(data.topic, data); 
 }); 
 

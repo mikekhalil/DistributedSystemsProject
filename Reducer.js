@@ -41,7 +41,7 @@ messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
 		//get job id from message
 		//var job_id = msg.data.job_id
 		var job_id = 'test';
-		reducer.redisReduce(RedisClient,"groupid", msg.data, reduceFunc, function() {
+		reducer.redisReduce(RedisClient,job_id, msg.data, reduceFunc, function() {
 			JobTracker[job_id].count += 1;
 			console.log('count: ' + JobTracker[job_id].count);
 			if(JobTracker[job_id].count === JobTracker[job_id].length) {

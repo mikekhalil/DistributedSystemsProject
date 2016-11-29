@@ -35,9 +35,12 @@ class GroupManager {
 
     finishedJob(group_id) {
         var job = this.jobs[group_id].shift(); //equivalent to dequeue
+        //check to see if another job is in the queue
+
     }
 
-    getNextJob(group_id) {
+
+    getCurrentJob(group_id) {
         if(jobs[group_id] && jobs[group_id].length > 0)
             return this.jobs[group_id][0];
     }
@@ -48,5 +51,7 @@ class GroupManager {
     
     startJobs() {
         //start jobs for each group on server start
+        
+
     }
 }

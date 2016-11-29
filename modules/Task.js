@@ -1,4 +1,11 @@
+class Task{
+    constructor(split, status){
+        this.split = split;
+        this.status = status;
+    }
+    setStatus(status) {
+        this.status = status;
+    }
+}
 
-
-var split;
-var status;
+module.exports = Task;

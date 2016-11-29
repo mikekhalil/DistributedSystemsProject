@@ -13,7 +13,22 @@ function writeSplit(split, filepath) {
     });
 }
 
-var func = function SplitInput(file, splitDir, callback) {
+function makeDirs(groupDir, jobDir, splitDir) {
+    var fs = require('fs');
+    if (!fs.existsSync(groupDir)) {
+        fs.mkdirSync(groupDir);
+    }
+    if (!fs.existsSync(groupDir + "/" + jobDir)) {
+        fs.mkdirSync(groupDir + "/" + jobDir);
+    }
+    if (!fs.existsSync(groupDir + "/" + jobDir + "/" + splitDir)) {
+        fs.mkdirSync(groupDir + "/" + jobDir + "/" + splitDir);
+    }
+}
+
+// splits file and saves the splits in to groupDir/jobDir/splits
+// ex. groupA/job0/splits/0.txt
+var func = function SplitInput(file, groupDir, jobDir, callback) {
     var fs = require('fs');
     var util = require('util');
     var stream = require('stream');
@@ -23,10 +38,9 @@ var func = function SplitInput(file, splitDir, callback) {
     var splitCount = 0;     /* number of splits			 */
     var filepath = '';      /* full path of split		 */
     const splitSize = 16000; /* split size in bytes		 */
+    const splitDir = groupDir + "/" + jobDir + "/" + "splits";
 
-    if (!fs.existsSync(splitDir)) {
-        fs.mkdirSync(splitDir);
-    }
+    makeDirs(groupDir, jobDir, "splits");
 
     var s = fs.createReadStream(file)
         .pipe(es.split())

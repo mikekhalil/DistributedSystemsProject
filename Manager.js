@@ -30,6 +30,9 @@ socket.on('UploadedFile', function(file) {
         var dir = path.join(__dirname,config.multer.path,'splits');
 
         //create directory for splits 
+        // SplitInput(file, groupDir, jobDir, callback)
+        // ex. SplitInput(file, "groupA", "job0", callback)
+        // saves first input split to groupA/job0/splits/0.txt
         splitter.splitInput(file.data,dir,function(inputSplits) {
             setup[file.type] = inputSplits;
         });

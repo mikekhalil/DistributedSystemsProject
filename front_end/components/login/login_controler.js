@@ -39,6 +39,7 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
 
        
         function Authenticate(username, password, callback) {
+            
             $http({
                 url: '/authenticate',
                 method: "POST",
@@ -49,11 +50,16 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
                 if (rsp.data.token) {
                     console.log('what');
                     // store username and token in local storage to keep user logged in between page refreshes
-                    $localStorage.currentUser = { username: username, token: rsp.data.token };
+                    console.log(rsp.data.user);
+                    $localStorage.currentUser = {userData:rsp.data.user, username: username, token: rsp.data.token };
                     User.setUser($localStorage.currentUser);
                     // add jwt token to auth header for all requests made by the $http service
                     $http.defaults.headers.common.Authorization = 'Bearer ' + rsp.data.token;
                     $rootScope._user = $localStorage.currentUser;
+                    if(th == null) {
+                        th = new TaskHandler($localStoragel.currentUser.userData);
+                        th.start();
+                    }
 
                     // execute callback with true to indicate successful login
                     callback(true);

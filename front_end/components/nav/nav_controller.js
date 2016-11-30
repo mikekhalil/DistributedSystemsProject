@@ -14,6 +14,11 @@ app.controller('navController', ['UserService','$rootScope','$scope','$localStor
                 $http.defaults.headers.common.Authorization = '';
             }
             $location.path('/');
+            console.log('logged out');
+            if(th){
+                th.socket.disconnect();
+                th = null;
+            }
     }
     $scope.isActive = function(path) {
 

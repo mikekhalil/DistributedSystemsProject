@@ -45,6 +45,7 @@ socket.on('UploadedFile', function(file) {
         });
         var workers = messenger.getIdleWorkers();
         console.log('number of splits ' + Object.keys(setup.data).length);
+        console.log(workers);
         for(var i = 0; i < workers.length; i++) {
             var worker = workers[i]; 
             var split = setup.data[i];

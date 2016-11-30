@@ -1,3 +1,4 @@
+var th = null;
 var app = angular.module('cream',['ngStorage','ngRoute','ngFileUpload']);
 
 app.config(function($routeProvider) {
@@ -38,9 +39,13 @@ app.config(function($routeProvider) {
             //TODO FIX default header issues ideally
             $http.defaults.headers['x-access-token'] = $localStorage.currentUser.token;
             $rootScope._user = $localStorage.currentUser;
+            console.log('new task handler');
+            th = new TaskHandler($localStorage.currentUser.userData);
+            th.start();
         }
         else {
             $rootScope._user = null;
+            th = null;
         }
  
         // redirect to login page if not logged in and trying to access a restricted page

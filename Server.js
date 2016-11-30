@@ -246,7 +246,8 @@ app.post('/authenticate', function(req, res) {
 				//send token
 				res.json({
 					success: true,
-					token: token
+					token: token,
+					user : user.data
 				});
 			}   
 		}

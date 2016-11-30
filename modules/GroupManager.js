@@ -1,13 +1,17 @@
 class GroupManager {
-    constructor(/*db*/){
+    constructor(Group){
         this.jobs = {};
         this.users = {};
-
-        // db.jobs.find({}, function(err,groups) {
-        //     if(err)
-        //         throw err;
-        //     console.log(groups);
-        // });
+        var that = this;
+        Group.find({}, function(err,groups) {
+            if(err)
+                throw err;
+            
+            for(var group of groups) {
+                that.jobs[group.name] = [];
+                that.users[group.name] = [];
+            }
+        });
     }
 
     registerUser(user) {
@@ -16,11 +20,13 @@ class GroupManager {
     }
 
     removeUser(sock_id) {
+        console.log('removing ' + sock_id);
+        var that = this;
         Object.keys(this.users).forEach(function(key) {
-            var users = this.users[key]
+            var users = that.users[key]
             for (var user in users) {
                 if (users[user].sock_id == sock_id) {
-                   this.users[key].splice(user, 1); 
+                   that.users[key].splice(user, 1); 
                 }
             }
             
@@ -67,6 +73,10 @@ class GroupManager {
         //start jobs for each group on server start
         
 
+    }
+
+    dump() {
+        console.log(this);
     }
 
 }

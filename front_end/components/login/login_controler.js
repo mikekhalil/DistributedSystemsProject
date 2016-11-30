@@ -57,7 +57,7 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
                     $http.defaults.headers.common.Authorization = 'Bearer ' + rsp.data.token;
                     $rootScope._user = $localStorage.currentUser;
                     if(th == null) {
-                        th = new TaskHandler($localStoragel.currentUser.userData);
+                        th = new TaskHandler($localStorage.currentUser.userData);
                         th.start();
                     }
 

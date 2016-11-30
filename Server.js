@@ -21,7 +21,7 @@ var Vorker = require(__dirname + '/modules/User.js');
 
 
 var ClientTab = [];  
-var GroupManager = new gm(); 
+var GroupManager = new gm(Group); 
 
 var apiRoutes = express.Router(); 
 app.use(express.static(__dirname + '/front_end'));
@@ -267,8 +267,11 @@ io.on('connection', function(socket) {
 	io.emit('clientTabUpdate' , ClientTab); 
 	io.emit('gmUpdate', GroupManager); 
 
+
 	socket.on('register', function (msg) {
+		
 		registerClient(socket, msg); 
+		GroupManager.dump();
 	}); 
 	socket.on('manager', function (msg) {
 		io.emit('manager' , msg); 
@@ -298,6 +301,8 @@ io.on('connection', function(socket) {
 		}
 		// console.log('A client disconnected'); 
 		// console.log(ClientTab); 
+		GroupManager.removeUser(socket.id);
+		GroupManager.dump();
 		io.emit('clientTabUpdate' , ClientTab);
 	}); 
 	socket.on('server', function (msg){
@@ -348,6 +353,7 @@ function registerClient(socket, msg) {
 			groups: Groups
 		}; */ 
 		var user =  new Vorker(socket.id, msg.data); 
+		console.log(user);
 		GroupManager.registerUser(user); 
 		io.emit('gmUpdate', GroupManager); 
 	}

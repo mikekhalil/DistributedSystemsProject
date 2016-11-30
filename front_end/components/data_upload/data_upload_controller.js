@@ -1,4 +1,4 @@
-app.controller('uploadController', ['$scope','Upload','$timeout','$location','$localStorage', function($scope,Upload,$timeout,$location,$localStorage) {
+app.controller('uploadController', ['$scope','Upload','$timeout','$location','$localStorage', '$http', function($scope,Upload,$timeout,$location,$localStorage, $http) {
     $scope.cream = "This is the value of cream";
     $scope.isActive = function(route) {
         console.log('activity changed');
@@ -7,40 +7,30 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
     $scope.dataLog = '';
     $scope.mapLog = '';
     $scope.reduceLog = '';
+    $scope.myGroups = [];
+
+    $scope.allFiles = {};
     
     var token = $localStorage.currentUser.token
     
-    $scope.$watch('dataFiles', function () {
-        $scope.upload($scope.dataFiles,'dataLog', "data");
-    });
-
     $scope.$watch('dataFile', function () {
         if ($scope.dataFile != null) {
-            $scope.dataFiles = [$scope.dataFile]; 
+            $scope.allFiles["dataFile"] = [$scope.dataFile];
         }
     });
 
     $scope.$watch('mapFile', function() {
         if ($scope.mapFile != null) {
-            $scope.mapFiles = [$scope.mapFile];
+            $scope.allFiles["mapFile"] = [$scope.mapFile];
         }
-    });
-
-     $scope.$watch('mapFiles', function() {
-         $scope.upload($scope.mapFiles,'mapLog',"map");
     });
 
     $scope.$watch('reduceFile', function() {
         if ($scope.reduceFile != null) {
-            $scope.reduceFiles = [$scope.reduceFile];
+            $scope.allFiles["reduceFile"] = [$scope.reduceFile];
         }
     });
-
-     $scope.$watch('reduceFiles', function() {
-         $scope.upload($scope.reduceFiles,'reduceLog',"reduce");
-    });
-    
-    
+   
     //TODO CREATE progress bar?
     $scope.upload = function (files, log, type) {
         if (files && files.length) {
@@ -72,5 +62,42 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
             }
         }
     };
+
+    // are all the jobs properly initialized?
+    jobsInit = function(files) {
+        var len = Object.keys(files).length;
+        if ( len != 3 ) {
+            console.log("only " + len + " files submitted!");
+            return false;
+        }
+        return true;
+    }
+
+    $scope.startJob = function() {
+        if ($scope.selectedGroup != null && jobsInit($scope.allFiles)) {
+            console.log("Starting job in " + $scope.selectedGroup);
+            $scope.upload($scope.allFiles["dataFile"],'dataLog', "data");
+            $scope.upload($scope.allFiles["mapFile"],'mapLog',"map");
+            $scope.upload($scope.allFiles["reduceFile"],'reduceLog',"reduce");
+        }
+    }
+
+    $scope.getUser = function(){
+        $http({
+            url: '/api/user',
+            method: "GET",
+            headers: {'x-access-token' : token }
+        }).then(function(rsp) {
+            console.log(rsp.data);
+            $scope.myGroups = rsp.data.groups;
+
+        },function(rsp) {
+            console.log(rsp);
+        });
+    }
+
+    $scope.getUser();
+
+
    
 }]);

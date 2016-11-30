@@ -21,6 +21,7 @@
     border: 5px dashed blue;
 }
 </style>
+ <h3>1. Upload your data file, mapper.js, and reducer.js</h1>
 <div class="row"> 
     <div class="col-md-4">
         <div ngf-drop ngf-select ng-model="dataFile" class="drop-box" 
@@ -49,4 +50,7 @@
         <pre>{{reduceLog}}</pre>
     </div> 
 </div>
-
+<h3>2. Select one of your groups</h1>
+<select ng-model="selectedGroup" ng-options="x for x in myGroups"></select>
+<h3>3. Click start to begin!</h1>
+<button ng-click="startJob()" type="button" class="btn btn-success"><b>Start Job</b></button>

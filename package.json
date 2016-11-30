@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "prestart": "npm install",
-    "start": "node Server.js"
+    "start": "mkdir InputFiles && node Server.js"
   },
   "contributors": [
     {

@@ -148,7 +148,7 @@ apiRoutes.post('/InputFiles', function (req, res) {
 
         res.json({error_code:0,err_desc:null});
         fs.renameSync(req.file.path,path.join(dir, req.file.filename));
-
+		console.log(req.body);
 
 		//just send path to data file
 		var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};

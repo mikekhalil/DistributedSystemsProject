@@ -32,7 +32,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
     });
    
     //TODO CREATE progress bar?
-    $scope.upload = function (files, log, type) {
+    $scope.upload = function (files, log, type,group) {
         if (files && files.length) {
             for (var i = 0; i < files.length; i++) {
               var file = files[i];
@@ -41,7 +41,8 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
                     url: 'http://localhost:8080/api/InputFiles/',
                     data: {
                       file: file,
-                      type : type 
+                      type : type,
+                      group: group
                     },
                     headers : {'x-access-token' : token }
                 }).then(function (resp) {
@@ -76,9 +77,9 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
     $scope.startJob = function() {
         if ($scope.selectedGroup != null && jobsInit($scope.allFiles)) {
             console.log("Starting job in " + $scope.selectedGroup);
-            $scope.upload($scope.allFiles["dataFile"],'dataLog', "data");
-            $scope.upload($scope.allFiles["mapFile"],'mapLog',"map");
-            $scope.upload($scope.allFiles["reduceFile"],'reduceLog',"reduce");
+            $scope.upload($scope.allFiles["dataFile"],'dataLog', "data",$scope.selectedGroup);
+            $scope.upload($scope.allFiles["mapFile"],'mapLog',"map",$scope.selectedGroup);
+            $scope.upload($scope.allFiles["reduceFile"],'reduceLog',"reduce",$scope.selectedGroup);
         }
     }
 

@@ -33,7 +33,7 @@ for  'manager', 'reducer' , 'worker' and 'server'.
 module.exports = function (socket, channelname){
 	var module = {}; 
 	module.ClientTab = []; 
-	module.GroupManager = new gm(); 
+	module.GroupManager = null; 
 
 	/*channels for incoming and outgoing traffic*/
 	module.inchannel = postal.channel("in" + channelname); 

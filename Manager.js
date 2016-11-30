@@ -6,6 +6,7 @@ var splitter = require(__dirname + '/modules/SplitInput.js');
 const path = require('path');
 const resourceManager = require(__dirname + '/modules/ClientManager.js');
 const JobManager = require(__dirname + '/modules/JobFactory.js');
+var Group = require(__dirname + '/models/group');
 
 //TODO MAP Group ID's to sockIDS in client table
 

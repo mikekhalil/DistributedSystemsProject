@@ -1,22 +1,36 @@
 class GroupManager {
-    constructor(db){
+    constructor(/*db*/){
         this.jobs = {};
-        this.workers = {};
-        db.jobs.find({}, function(err,groups) {
-            if(err)
-                throw err;
-            console.log(groups);
-        });
+        this.users = {};
+
+        // db.jobs.find({}, function(err,groups) {
+        //     if(err)
+        //         throw err;
+        //     console.log(groups);
+        // });
     }
 
-    registerWorker(worker) {
-        for(var group of worker.groups)
-            this.workers[group.name].push(worker);
+    registerUser(user) {
+        for(var group of user.group_ids)
+            this.users[group].push(user);
     }
+
+    removeUser(sock_id) {
+        Object.keys(this.users).forEach(function(key) {
+            var users = this.users[key]
+            for (var user in users) {
+                if (users[user].sock_id == sock_id) {
+                   this.users[key].splice(user, 1); 
+                }
+            }
+            
+        });
+    }
+    
 
     registerGroup(group) {
         this.jobs[group.name] = group.jobs;
-        this.workers[group.name] = group.users;
+        this.users[group.name] = group.users;
     }
 
     registerJob(job, group_id) {
@@ -29,8 +43,8 @@ class GroupManager {
         return this.jobs[group_id];
     }
 
-    getWorkers(group_id) {
-        return this.workers[group_id];
+    getusers(group_id) {
+        return this.users[group_id];
     }
 
     finishedJob(group_id) {
@@ -46,7 +60,7 @@ class GroupManager {
     }
 
     hasNextJob(group_id) {
-         return this.getJobs(groupid) > 0;
+         return this.getJobs(groupid).length > 0;
     }
     
     startJobs() {
@@ -54,4 +68,7 @@ class GroupManager {
         
 
     }
+
 }
+
+module.exports = GroupManager; 

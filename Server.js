@@ -16,10 +16,12 @@ var jwt    = require('jsonwebtoken');
 var User   = require(__dirname + '/models/user'); // get our mongoose model
 var Group = require(__dirname + '/models/group');
 var _  = require("lodash"); 
-    
+var gm = require(__dirname + '/modules/GroupManager.js'); 
+var Vorker = require(__dirname + '/modules/User.js'); 
 
-/*globals*/
-var ClientTab = []; 
+
+var ClientTab = [];  
+var GroupManager = new gm(); 
 
 var apiRoutes = express.Router(); 
 app.use(express.static(__dirname + '/front_end'));
@@ -263,6 +265,7 @@ io.on('connection', function(socket) {
 	
 	//console.log('a client connected');
 	io.emit('clientTabUpdate' , ClientTab); 
+	io.emit('gmUpdate', GroupManager); 
 
 	socket.on('register', function (msg) {
 		registerClient(socket, msg); 
@@ -298,7 +301,7 @@ io.on('connection', function(socket) {
 		io.emit('clientTabUpdate' , ClientTab);
 	}); 
 	socket.on('server', function (msg){
-		if (msg.topic=="StartedMapReduce") {
+		if (msg.topic=="MapReduce") {
 			for (var i in ClientTab) {
 				if (ClientTab[i].sockid == socket.id)  {
 					ClientTab[i].status = "active"; 
@@ -334,7 +337,24 @@ function registerClient(socket, msg) {
 			status: "idle", 
 			role: msg.sender
 		});
+
 	io.emit('clientTabUpdate' , ClientTab);
+
+
+
+	if (msg.sender.toLowerCase() == "worker") {
+		/*msg.data = {
+			id: Id, 
+			groups: Groups
+		}; */ 
+		var user =  new Vorker(socket.id, msg.data); 
+		GroupManager.registerUser(user); 
+		io.emit('gmUpdate', GroupManager); 
+	}
+
+	
+	
 }
+
 
 

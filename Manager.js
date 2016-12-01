@@ -6,72 +6,61 @@ var splitter = require(__dirname + '/modules/SplitInput.js');
 const path = require('path');
 const resourceManager = require(__dirname + '/modules/ClientManager.js');
 const JobManager = require(__dirname + '/modules/JobFactory.js');
+
+
+var mongoose    = require('mongoose');
 var Group = require(__dirname + '/models/group');
-var JobSchema = require(__dirname + '/models/job');
+var JobSchema = require(__dirname + '/models/job.js');
 var Job = (__dirname + '/modules/Job');
 
-//TODO MAP Group ID's to sockIDS in client table
 
-//Job Object : { inputSplit (primary key - string - path), status (string), worker (socketid - foreign key)}
-var jobTable = [];
-
-//TODO: Create setup table (also write to db) to know when to start job for a particular group
-var setup = {map : null, reduce : null, data : null }
-
+mongoose.connect(config.mongodb.url);
 
 //TODO: set up a method that allows new clients that just connected to start comoputing all of the jobs that thare are part of
 
 
 //use client table and job table to assign jobs based off availability
 socket.on('UploadedFile', function(file) {
-    console.log(file);
     //update the particular job
-    Job.findOne({name: file.job_id}, function(err,doc) {
+    JobSchema.findOne({name: file.job_id}, function(err,doc) {
         if(err)
-            console.log(err);
-        else {
-             if( file.type === config.REDUCE || file.type === config.MAP ){
-                var fileData = fs.readFileSync(file.data, "utf8");
-                doc[file.type] = fileData;
-            }
-            else {
-                //Data file, Create Input Splits
-                    var groupDir = path.join(__dirname,config.multer.path,file.group_id);
+            throw err;
 
-                    splitter.splitInput(file.data,groupDir,file.job_id,function(inputSplits) {
-                        setup[file.type] = inputSplits;
-                    });
-            }
+        if( file.type === config.REDUCE || file.type === config.MAP ){
+            var fileData = fs.readFileSync(file.data, "utf8");
+            doc[file.type] = fileData;
+            doc.save();
         }
+        else {
+            //Data file, Create Input Splits
+            var groupDir = path.join(__dirname,config.multer.path,file.group_id);
+            splitter.splitInput(file.data,groupDir,file.job_id,function(inputSplits) {
+                doc.data = file.data;
+                //doc.splits = inputSplits;
+                var index = 0;
+                Object.keys(inputSplits).forEach(function(key){
+                    doc.splits.set(index++, inputSplits[key]);
+                });
+                doc.markModified('data');
+                doc.markModified('splits');
+                doc.save();
+                console.log('saved job');
+            });
+        }
+        //implement function to see if job is initalized
+
     });
    
 });
 
 messenger.inchannel.subscribe("SystemReset" , function(msg) {
-	jobTable = []; 
-	setup = {map : null, reduce : null, data : null }; 
+	
 }); 
 
 messenger.inchannel.subscribe("Results", function(msg) {
-    var sockid = msg.data.sockid;
-    var completedJob = msg.data.inputSplit;
-    JobManager.setJobStatus(jobTable,completedJob,config.status.COMPLETE);
-    var job = JobManager.getNextJob(jobTable);
-    JobManager.setJobStatus(jobTable,job,config.status.ACTIVE);
-    var workers = messenger.getIdleWorkers();
-    
-    //TODO: Add a timeout featue - if job has been active for more tha X seconds, update it to not active - assign job to another node
-    if(job)
-        JobManager.setJobStatus(jobTable,job.path,config.status.ACTIVE);
-
-    if (job != null) {
-        //still has to go to vork
-         console.log(job.path);
-        messenger.publishToSelectedWorkers([sockid], "InputSplit", {fileData : fs.readFileSync(job.path,"utf8"), inputSplit : job.path})
-    }
+    console.log(msg.data);
 });
 
 messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {
-    //TODO Create actual JobManager Datastrucutre
-    //TODO Create Group manager data structurez
+    //TODO HOW DO WE UPDATE GroupManager here
 })

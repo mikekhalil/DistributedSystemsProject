@@ -182,7 +182,7 @@ apiRoutes.post('/registerJob', function(req,res) {
     	reduce: null,     
     	status: null,     
     	results: null,    
-    	splits : null,   
+    	splits : [],   
     	data: null
 	});
 	newJob.save(function(err) {

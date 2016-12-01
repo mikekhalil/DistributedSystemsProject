@@ -77,7 +77,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
 
     $scope.startJob = function() {
         if ($scope.selectedGroup != null && jobsInit($scope.allFiles)) {
-            var id = Date.now();
+            var id = Date.now().toString();
             console.log("Starting job in " + $scope.selectedGroup);
             registerJob(id,$scope.selectedGroup, $scope.user.email);
         }

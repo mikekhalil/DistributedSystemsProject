@@ -180,7 +180,7 @@ apiRoutes.post('/registerJob', function(req,res) {
 		group : req.body.group,
     	map : null,       
     	reduce: null,     
-    	status: null,     
+    	status: config.status.INCOMPLETE,     
     	results: null,    
     	splits : [],   
     	data: null

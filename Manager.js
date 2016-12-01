@@ -17,7 +17,10 @@ var Job = (__dirname + '/modules/Job');
 mongoose.connect(config.mongodb.url);
 
 //TODO: set up a method that allows new clients that just connected to start comoputing all of the jobs that thare are part of
-
+var isInitialized = function(doc) {
+    
+    return doc.data!= null && doc.map!= null && doc.reduce!= null;
+}
 
 //use client table and job table to assign jobs based off availability
 socket.on('UploadedFile', function(file) {
@@ -29,6 +32,8 @@ socket.on('UploadedFile', function(file) {
         if( file.type === config.REDUCE || file.type === config.MAP ){
             var fileData = fs.readFileSync(file.data, "utf8");
             doc[file.type] = fileData;
+            console.log(doc);
+
             doc.save();
         }
         else {
@@ -47,7 +52,11 @@ socket.on('UploadedFile', function(file) {
                 console.log('saved job');
             });
         }
-        //implement function to see if job is initalized
+        if(isInitialized(doc)){
+            consol.log('job is ready to go');
+            var job = new Job(file.job_id, file.group_id, messenger,config.status.INCOMPLETE,doc.map,doc.reduce,doc.splits);
+            //TODO add to group manager (how to get live updates of group manager?)
+        }
 
     });
    

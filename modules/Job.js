@@ -9,11 +9,10 @@ var InitialPacket = require('./InitialPacket.js');
 var config = require(__dirname + '/../config.json');
 
 class Job {
-    constructor(id, group, messenger,path,status,mapper,reducer,splits) {
+    constructor(id, group, messenger,status,mapper,reducer,splits) {
         this.id = id;
         this.group = group;
         this.messenger = messenger;
-        this.path = path;
         this.status = status;
         this.mapper = mapper;
         this.reducer = reducer;

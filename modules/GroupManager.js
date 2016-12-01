@@ -55,9 +55,13 @@ class GroupManager {
     }
 
     finishedJob(group_id) {
-        var job = this.jobs[group_id].shift(); //equivalent to dequeue
+        //TODO: Set job status to complete (in db) then check to see if otehr job is in queue
+        var completedJob = this.jobs[group_id].shift(); //equivalent to dequeue
         //check to see if another job is in the queue
-
+        if (this.hasNextJob(group_id)) {
+            var currentJob = this.getCurrentJob(group_id);
+            currentJob.start();
+        }
     }
 
 

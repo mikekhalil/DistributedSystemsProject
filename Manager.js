@@ -36,15 +36,12 @@ socket.on('UploadedFile', function(file) {
             }
             else {
                 //Data file, Create Input Splits
-                var dir = path.join(__dirname,config.multer.path,file.group_id,file.job_id,'splits');
+                    var groupDir = path.join(__dirname,config.multer.path,file.group_id);
 
-                //create directory for splits 
-                splitter.splitInput(file.data,dir,function(inputSplits) {
-                    doc[file.type] = inputSplits;
-                });
-        
+                    splitter.splitInput(file.data,groupDir,file.job_id,function(inputSplits) {
+                        setup[file.type] = inputSplits;
+                    });
             }
-            
         }
     });
    

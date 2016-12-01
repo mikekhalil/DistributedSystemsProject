@@ -76,8 +76,7 @@ module.exports = function (socket, channelname){
 			return; 
 		}
 		data = wrapData(channelname, recipient, topic, null, data); 
-		m
-		odule.outchannel.publish("outgoing", data); 
+		module.outchannel.publish("outgoing", data); 
 	}
 	module.publishToAll = function (topic, data) {
 		for (var i in config.components) {

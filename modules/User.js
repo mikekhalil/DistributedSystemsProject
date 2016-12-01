@@ -1,3 +1,4 @@
+'use strict';
 class User {
     constructor(sock_id, user){
         this.sock_id = sock_id;

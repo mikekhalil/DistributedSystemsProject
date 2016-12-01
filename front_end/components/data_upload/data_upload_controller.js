@@ -32,7 +32,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
     });
    
     //TODO CREATE progress bar?
-    $scope.upload = function (files, log, type,group) {
+    $scope.upload = function (files, log, type,group_id,job_id) {
         if (files && files.length) {
             for (var i = 0; i < files.length; i++) {
               var file = files[i];
@@ -42,7 +42,8 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
                     data: {
                       file: file,
                       type : type,
-                      group: group
+                      group: group_id,
+                      job : job_id
                     },
                     headers : {'x-access-token' : token }
                 }).then(function (resp) {
@@ -76,11 +77,30 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
 
     $scope.startJob = function() {
         if ($scope.selectedGroup != null && jobsInit($scope.allFiles)) {
+            var id = Date.now();
             console.log("Starting job in " + $scope.selectedGroup);
-            $scope.upload($scope.allFiles["dataFile"],'dataLog', "data",$scope.selectedGroup);
-            $scope.upload($scope.allFiles["mapFile"],'mapLog',"map",$scope.selectedGroup);
-            $scope.upload($scope.allFiles["reduceFile"],'reduceLog',"reduce",$scope.selectedGroup);
+            registerJob(id,$scope.selectedGroup, $scope.user.email);
         }
+    }
+
+
+    var registerJob = function(job_id,group_id, user_id)  {
+        //generate job id for now :: TODO: get string input
+        $http({
+            url: '/api/registerJob',
+            method: 'POST',
+            data: {id: job_id, group: $scope.selectedGroup},
+            headers: {'x-access-token': token }
+        }).then(function(rsp) {
+            console.log(rsp.data);
+            console.log('uploading files');
+            $scope.upload($scope.allFiles["dataFile"],'dataLog', "data",$scope.selectedGroup, job_id);
+            $scope.upload($scope.allFiles["mapFile"],'mapLog',"map",$scope.selectedGroup,job_id);
+            $scope.upload($scope.allFiles["reduceFile"],'reduceLog',"reduce",$scope.selectedGroup,job_id);
+        },function(rsp) {  
+            console.log('err');
+            console.log(rsp.data);
+        });
     }
 
     $scope.getUser = function(){
@@ -90,6 +110,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
             headers: {'x-access-token' : token }
         }).then(function(rsp) {
             console.log(rsp.data);
+            $scope.user = rsp.data;
             $scope.myGroups = rsp.data.groups;
 
         },function(rsp) {

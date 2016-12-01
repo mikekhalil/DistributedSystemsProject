@@ -1,3 +1,4 @@
+'use strict';
 class Task{
     constructor(split, status){
         this.split = split;

@@ -10,5 +10,6 @@ module.exports = mongoose.model('Job', new Schema({
     status: String,     //queued | active | completed
     results: String,    //result data dump text file
     splits : [String],   //Path to splits,
-    data: String
+    data: String,
+    group: String
 }));

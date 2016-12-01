@@ -1,3 +1,4 @@
+'use strict';
 class InitialPacket{
     constructor(mapper, reducer, job_id, group_id) {
         this.mapper = mapper;

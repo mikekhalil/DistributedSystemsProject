@@ -1,3 +1,4 @@
+'use strict';
 class GroupManager {
     constructor(Group){
         this.jobs = {};
@@ -41,7 +42,7 @@ class GroupManager {
 
     registerJob(job, group_id) {
         if(this.jobs[group_id].length == 0)
-            job.start();
+            job.start(this);
         this.jobs[group_id].push(job);
     }
 

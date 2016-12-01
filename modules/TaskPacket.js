@@ -1,3 +1,4 @@
+'use strict';
 class TaskPacket{
     constructor(fileData, inputSplit,job_id, group_id) {
         this.fileData = fileData;

@@ -18,6 +18,7 @@ var Group = require(__dirname + '/models/group');
 var _  = require("lodash"); 
 var gm = require(__dirname + '/modules/GroupManager.js'); 
 var Vorker = require(__dirname + '/modules/User.js'); 
+var JobSchema = require(__dirname + '/models/job.js');
 
 
 var ClientTab = [];  
@@ -61,6 +62,7 @@ apiRoutes.use(function(req, res, next) {
 		else {
 			// if everything is good, save to request for use in other routes
 			req.decoded = decoded;    
+			console.log(req.decoded._doc.data);
 			next();
 		}
 	});
@@ -151,7 +153,7 @@ apiRoutes.post('/InputFiles', function (req, res) {
 		console.log(req.body);
 
 		//just send path to data file
-		var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
+		var payload = {type : req.body.type, data : path.join(dir,req.file.filename), group_id: req.body.group, job_id: req.body.job};
 		io.emit('UploadedFile', payload);
     })
 });
@@ -170,8 +172,31 @@ apiRoutes.get('/group', function(req,res) {
 });
 
 
+apiRoutes.post('/registerJob', function(req,res) {
+	console.log(req.decoded._doc.data.email);
+	var newJob = new JobSchema({
+		name: req.body.id,  
+    	owners: [req.decoded._doc.data.email], 
+		group : req.body.group,
+    	map : null,       
+    	reduce: null,     
+    	status: null,     
+    	results: null,    
+    	splits : null,   
+    	data: null
+	});
+	newJob.save(function(err) {
+		if(err) {
+			console.log(err);
+			res.json({success : false, error : err});
+		}
+		res.json({success : true });
+	});
+});
+
+
 apiRoutes.post('/joinGroup', function(req,res) {
-	//TODO join group 
+	//TODO jupdate groupManager
 	//update user and group documents
 	var user = req.decoded._doc.data;
 	var data = req.body;

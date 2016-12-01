@@ -3,6 +3,7 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
         closeModal = function(id) {
             $(id).modal('hide');
             $('.modal').removeClass('show');
+            $('.modal-backdrop').remove();
         }
         
         if($localStorage.currentUser){
@@ -22,7 +23,7 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
                     Authenticate($scope.registerEmail, $scope.registerPassword, function (result) {
                         console.log(result);
                         closeModal('#regModal');
-                        closeModal('#regModal');
+                        //closeModal('#regModal');
 
                         $location.path('/dashboard');
                         

@@ -17,68 +17,96 @@ var Job = (__dirname + '/modules/Job');
 mongoose.connect(config.mongodb.url);
 
 
-//please replace hacky man
-var hacky = {};
 
-//TODO: set up a method that allows new clients that just connected to start comoputing all of the jobs that thare are part of
-var isInitialized = function(job_id) {;    
-    return hacky[job_id] == 3;
-}
+socket.on('UploadedFile', function(files) {
+    console.log(files);
 
-var createJob = function(id) {
-   //TODO: Update Group Manager - propogate change to Server / Reducer
-   
-}
-
-var counter = 0;
-//use client table and job table to assign jobs based off availability
-socket.on('UploadedFile', function(file) {
-    //update the particular job
-    JobSchema.findOne({name: file.job_id}, function(err,doc) {
-        if(err)
+    JobSchema.findOne({name : files.job_id}, function(err,doc) {
+        if(err) 
             throw err;
+        
+        fs.readFile(files.map,'utf8', (err, mapData) => {
+            if(err) 
+                throw err;
+            fs.readFile(files.reduce,'utf8', (err,redData) => {
+                if(err)
+                    throw err;
+                
+                const groupDir = path.join(__dirname, config.multer.path, files.group_id);
+                splitter.splitInput(files.data, groupDir, files.job_id, (inputSplits) => {
+                    doc.map = mapData;
+                    doc.reduce = redData;
+                    doc.data = files.data;
+                    let index = 0;
+                    Object.keys(inputSplits).forEach((key) => {
+                        doc.splits.set(index++, inputSplits[key]);
+                    });
+                    doc.save((err,doc) => {
+                        if(err)
+                            throw err;
+                        console.log(doc);
+                    });
+                });
 
-        if( file.type === config.REDUCE || file.type === config.MAP ){
-            var fileData = fs.readFileSync(file.data, "utf8");
-            doc[file.type] = fileData;
-            console.log('map or reduce');
-            doc.save(function(err,doc) { 
-                if(hacky[file.job_id]){
-                    hacky[file.job_id]++;
-                    if(isInitialized(file.job_id)){
-                        createJob(file.job_id);
-                    }
-                }
-                else{
-                    hacky[file.job_id] = 1;
-                }
+
+
+
+                // doc['map'] = mapData;
+                // doc['reduce'] = redData;
+                // doc['data'] = 
+                
             });
-        }
-        else {
-            //Data file, Create Input Splits
-            var groupDir = path.join(__dirname,config.multer.path,file.group_id);
-            splitter.splitInput(file.data,groupDir,file.job_id,function(inputSplits) {
-                doc.data = file.data;
-                var index = 0;
-                Object.keys(inputSplits).forEach(function(key){
-                    doc.splits.set(index++, inputSplits[key]);
-                });
-                doc.save(function(err,doc) {
-                        if(hacky[file.job_id]){
-                        hacky[file.job_id]++;
-                        if(isInitialized(file.job_id)){
-                            getJob(file.job_id);
-                        }
-                    }
-                    else{
-                        hacky[file.job_id] = 0;
-                    }
-                });
-                //console.log('splits + data');
-                //console.log('is initalized : ' + isInitialized(doc));
-            });
-        }
+        });
     });
+
+
+
+    //les
+    // //update the particular job
+    // JobSchema.findOne({name: file.job_id}, function(err,doc) {
+    //     if(err)
+    //         throw err;
+        
+    //         var fileData = fs.readFileSync(file.data, "utf8");
+    //         doc[file.type] = fileData;
+    //         console.log('map or reduce');
+    //         doc.save(function(err,doc) { 
+    //             if(hacky[file.job_id]){
+    //                 hacky[file.job_id]++;
+    //                 if(isInitialized(file.job_id)){
+    //                     createJob(file.job_id);
+    //                 }
+    //             }
+    //             else{
+    //                 hacky[file.job_id] = 1;
+    //             }
+    //         });
+    //     }
+    //     else {
+    //         //Data file, Create Input Splits
+    //         var groupDir = path.join(__dirname,config.multer.path,file.group_id);
+    //         splitter.splitInput(file.data,groupDir,file.job_id,function(inputSplits) {
+    //             doc.data = file.data;
+    //             var index = 0;
+    //             Object.keys(inputSplits).forEach(function(key){
+    //                 doc.splits.set(index++, inputSplits[key]);
+    //             });
+    //             doc.save(function(err,doc) {
+    //                     if(hacky[file.job_id]){
+    //                     hacky[file.job_id]++;
+    //                     if(isInitialized(file.job_id)){
+    //                         getJob(file.job_id);
+    //                     }
+    //                 }
+    //                 else{
+    //                     hacky[file.job_id] = 0;
+    //                 }
+    //             });
+    //             //console.log('splits + data');
+    //             //console.log('is initalized : ' + isInitialized(doc));
+    //         });
+    //     }
+    // });
 
 
  

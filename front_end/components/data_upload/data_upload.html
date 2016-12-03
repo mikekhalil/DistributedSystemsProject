@@ -54,3 +54,13 @@
 <select ng-model="selectedGroup" ng-options="x for x in myGroups"></select>
 <h3>3. Click start to begin!</h1>
 <button ng-click="startJob()" type="button" class="btn btn-success"><b>Start Job</b></button>
+
+<pre> {{log}} </pre>
+
+<div class="progress row">
+  <div class="col-sm-4 progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{percentage}}"
+  aria-valuemin="0" aria-valuemax="100" style="width:{{percentage}}%">
+    {{percentage}} % Complete 
+  </div>
+</div>
+

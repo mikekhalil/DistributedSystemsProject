@@ -19,6 +19,7 @@ var _  = require("lodash");
 var gm = require(__dirname + '/modules/GroupManager.js'); 
 var Vorker = require(__dirname + '/modules/User.js'); 
 var JobSchema = require(__dirname + '/models/job.js');
+var mkdirp = require('mkdirp');
 
 
 var ClientTab = [];  
@@ -62,7 +63,6 @@ apiRoutes.use(function(req, res, next) {
 		else {
 			// if everything is good, save to request for use in other routes
 			req.decoded = decoded;    
-			console.log(req.decoded._doc.data);
 			next();
 		}
 	});
@@ -137,24 +137,25 @@ apiRoutes.get('/groups', function(req,res) {
 
 apiRoutes.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){
-        //send response to client
-		var dir = path.join(__dirname,config.multer.path,req.body.type);
-		if(!fs.existsSync(dir)){
-             fs.mkdirSync(dir);
-        }
-
-        if(err){
-                res.json({error_code:1,err_desc:err});
-                return;
-        }
-
-        res.json({error_code:0,err_desc:null});
-        fs.renameSync(req.file.path,path.join(dir, req.file.filename));
+		if(err){
+			res.json({err: err});
+			return;
+		}
+		console.log(req.files);
 		console.log(req.body);
-
-		//just send path to data file
-		var payload = {type : req.body.type, data : path.join(dir,req.file.filename), group_id: req.body.group, job_id: req.body.job};
-		io.emit('UploadedFile', payload);
+		const dir = path.join(__dirname,config.multer.path,req.body.group,req.body.job);
+    	mkdirp(dir, function (err) {
+    		if (err) console.error(err)
+			else {
+				for(var file of req.files) {
+					fs.renameSync(file.path,path.join(dir,file.originalname));
+				}
+				res.json({error_code:0,err_desc:null});
+				console.log('sending files to manager');
+				var payload = {map: path.join(dir,req.body.map), data : path.join(dir,req.body.data), reduce: path.join(dir,req.body.reduce), group_id: req.body.group, job_id: req.body.job};
+		 		io.emit('UploadedFile', payload);
+			}
+		});
     })
 });
 

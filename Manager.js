@@ -47,13 +47,6 @@ socket.on('UploadedFile', function(files) {
                         console.log(doc);
                     });
                 });
-
-
-
-
-                // doc['map'] = mapData;
-                // doc['reduce'] = redData;
-                // doc['data'] = 
                 
             });
         });
@@ -61,55 +54,7 @@ socket.on('UploadedFile', function(files) {
 
 
 
-    //les
-    // //update the particular job
-    // JobSchema.findOne({name: file.job_id}, function(err,doc) {
-    //     if(err)
-    //         throw err;
-        
-    //         var fileData = fs.readFileSync(file.data, "utf8");
-    //         doc[file.type] = fileData;
-    //         console.log('map or reduce');
-    //         doc.save(function(err,doc) { 
-    //             if(hacky[file.job_id]){
-    //                 hacky[file.job_id]++;
-    //                 if(isInitialized(file.job_id)){
-    //                     createJob(file.job_id);
-    //                 }
-    //             }
-    //             else{
-    //                 hacky[file.job_id] = 1;
-    //             }
-    //         });
-    //     }
-    //     else {
-    //         //Data file, Create Input Splits
-    //         var groupDir = path.join(__dirname,config.multer.path,file.group_id);
-    //         splitter.splitInput(file.data,groupDir,file.job_id,function(inputSplits) {
-    //             doc.data = file.data;
-    //             var index = 0;
-    //             Object.keys(inputSplits).forEach(function(key){
-    //                 doc.splits.set(index++, inputSplits[key]);
-    //             });
-    //             doc.save(function(err,doc) {
-    //                     if(hacky[file.job_id]){
-    //                     hacky[file.job_id]++;
-    //                     if(isInitialized(file.job_id)){
-    //                         getJob(file.job_id);
-    //                     }
-    //                 }
-    //                 else{
-    //                     hacky[file.job_id] = 0;
-    //                 }
-    //             });
-    //             //console.log('splits + data');
-    //             //console.log('is initalized : ' + isInitialized(doc));
-    //         });
-    //     }
-    // });
 
-
- 
 });
 
 messenger.inchannel.subscribe("SystemReset" , function(msg) {

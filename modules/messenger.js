@@ -121,7 +121,7 @@ module.exports = function (socket, channelname){
 		module.ClientTab = ClientTab;   
 	}); 
 
-	socket.on('gmUpdate' , function(GroupManager) {
+	socket.on('GroupManagerUpdate' , function(GroupManager) {
 		module.GroupManager = GroupManager;   
 	}); 
 

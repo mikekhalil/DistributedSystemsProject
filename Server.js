@@ -318,7 +318,7 @@ io.on('connection', function(socket) {
 			//console.log("CREAM");
 			io.emit('worker', msg); 
 		}
-	});
+	}); 
 	socket.on('disconnect' , function (){
 		for (x in ClientTab) {
 			if (ClientTab[x].sockid == socket.id) {
@@ -358,6 +358,10 @@ io.on('connection', function(socket) {
 			}
 			io.emit('clientTabUpdate' , ClientTab);	
 		}
+		else if (msg.topic=="GroupManagerUpdate") {
+			GroupManager = msg.GroupManager;
+			io.emit('GroupManagerUpdate', GroupManager);  
+		}
 
 	}); 
 }); 
@@ -381,7 +385,7 @@ function registerClient(socket, msg) {
 		var user =  new Vorker(socket.id, msg.data); 
 		console.log(user);
 		GroupManager.registerUser(user); 
-		io.emit('gmUpdate', GroupManager); 
+		io.emit('GroupManagerUpdate', GroupManager); 
 	}
 
 	

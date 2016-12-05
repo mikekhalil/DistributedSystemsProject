@@ -1,4 +1,7 @@
-'use strict';
+'use strict'; 
+
+var socket = require('socket.io-client')('http://localhost:8080'); 
+
 class GroupManager {
     constructor(Group){
         this.jobs = {};
@@ -18,6 +21,7 @@ class GroupManager {
     registerUser(user) {
         for(var group of user.group_ids)
             this.users[group].push(user);
+        this.updateGroupManager(); 
     }
 
     removeUser(sock_id) {
@@ -32,6 +36,7 @@ class GroupManager {
             }
             
         });
+        this.updateGroupManager(); 
     }
     
 
@@ -79,7 +84,13 @@ class GroupManager {
         
 
     }
-
+    updateGroupManager() {
+        var msg = {}; 
+        msg.topic='GroupManagerUpdate'; 
+        msg.GroupManager = this; 
+        var dest = 'server'
+        socket.emit(dest, msg); 
+    }
     dump() {
         console.log(this);
     }

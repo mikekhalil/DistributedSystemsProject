@@ -1,4 +1,13 @@
 {
+    "aws_config": {    
+        "accessKeyId" : "AKIAJWWJTU6GGTB7KRKQ", 
+        "secretAccessKey": "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", 
+        "region": "us-east-2"
+    },
+    "aws" :  {
+        "bucket" : "cream-cs490",
+        "endpoint" : "https://s3.us-east-2.amazonaws.com/cream-cs490/"
+    },
     "multer" : {
         "path" : "InputFiles/",
         "data" : "dataFile",

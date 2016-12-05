@@ -48,7 +48,9 @@ messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
 			 	//TODO : Clean Up Redis Hash for particular job ID
 				var dir = path.join(__dirname, config.multer.path, group_id, job_id);
 				reducer.redisDump(RedisClient,job_id, group_id, dir, (err,res)=>{
-					console.log(res.path);
+					if(err)
+						console.log(err);
+					console.log(res);
 				});
 			}
 		});

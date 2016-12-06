@@ -21,7 +21,6 @@ var gm = new  GroupManager(Group, messenger);
 
 
 socket.on('UploadedFile', function(files) {
-    console.log('got files');
 
     JobSchema.findOne({name : files.job_id}, function(err,doc) {
         if(err) 
@@ -46,8 +45,6 @@ socket.on('UploadedFile', function(files) {
                     doc.save((err,doc) => {
                         if(err)
                             throw err;
-                        console.log('saved to db');
-                        console.log(doc);
                         var newJob = new Job(doc.name, doc.group, doc.status, doc.map, doc.reduce, doc.splits,messenger);
                        
                         gm.registerJob(newJob);
@@ -65,12 +62,10 @@ socket.on('UploadedFile', function(files) {
 });
 
 socket.on("GroupManagerRegister", (user) =>{
-    console.log(user);
     gm.registerUser(user);
 });
 
 socket.on("GroupManagerRemove", (user) => {
-    console.log(user);
     gm.removeUser(user);
 });
 
@@ -81,9 +76,12 @@ messenger.inchannel.subscribe("SystemReset" , function(msg) {
 messenger.inchannel.subscribe("Results", function(msg) {
     var group_id = msg.data.group_id;
     var job = gm.getCurrentJob(group_id);
-    if(job) {
-        gm.getCurrentJob(group_id).resultHandler(msg.data);
-    }
+    var nextTask = job.resultHandler(msg.data);
+    // if (nextTask == null) {
+    //     //job is done
+    //     gm.finishedJob(group_id);
+    // }
+    //TODO: implement counter to tell if job is done
 
     
 });

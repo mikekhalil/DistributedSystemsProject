@@ -20,9 +20,17 @@ class GroupManager {
     }
 
     registerUser(user) {
-        for(var group of user.group_ids)
+        for(var group of user.group_ids){
             this.users[group].push(user);
-       
+            var job = this.getCurrentJob(group);
+            if(job) {
+                job.initalizeWorker(user.sock_id);
+                var taskID = job.getNextTask();
+                if(taskID){
+                    job.assignJobToWorker(taskID, user.sock_id);
+                }
+            }
+        }
     }
 
     removeUser(sock_id) {
@@ -49,7 +57,7 @@ class GroupManager {
 
     registerJob(job) {
         var group_id = job.group;
-        console.log(group_id);
+        console.log(this.jobs[group_id]);
         if(this.jobs[group_id].length == 0)
             job.start(this);
         this.jobs[group_id].push(job);
@@ -68,26 +76,26 @@ class GroupManager {
         //TODO: Set job status to complete (in db) then check to see if otehr job is in queue
         var completedJob = this.jobs[group_id].shift(); //equivalent to dequeue
         //check to see if another job is in the queue
+        console.log('finished job');
         if (this.hasNextJob(group_id)) {
             var currentJob = this.getCurrentJob(group_id);
-            currentJob.start();
+            currentJob.start(this);
+            console.log('starting new job');
         }
     }
 
 
     getCurrentJob(group_id) {
-       
-    
         if(this.jobs[group_id] && this.jobs[group_id].length > 0)
             return this.jobs[group_id][0];
     }
 
     hasNextJob(group_id) {
-         return this.getJobs(groupid).length > 0;
+         return this.getJobs(group_id).length > 0;
     }
     
     startJobs() {
-        //start jobs for each group on server start
+        //TODO: start jobs for each group on server start
         
 
     }

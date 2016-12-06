@@ -71,11 +71,10 @@ class Job {
         this.setTaskStatus(res.inputSplit,config.status.COMPLETE);
         var taskID = this.getNextTask();
         
-        if (taskID != null) {
-            this.setTaskStatus(taskID,config.status.ACTIVE);
-            var packet = new TaskPacket(fs.readFileSync(taskID, "utf-8"), taskID, this.id, this.group);
-            this.messenger.publishToSelectedWorkers([sockid], "InputSplit", packet);
+        if (taskID) {
+            this.assignJobToWorker(taskID, sockid);
         }
+        return taskID;    
     }
     getNextTask(){
         var glob = null;
@@ -91,5 +90,17 @@ class Job {
     isComplete() {
         return getNextTask() != null;
     }
+
+    initalizeWorker(sockid) {
+        var packet = new InitialPacket(this.mapper,this.reducer,this.id,this.group);
+        this.messenger.publishToSelectedWorkers([sockid],"MapReduce", packet);
+    }
+
+    assignJobToWorker(taskID,sockid){
+        this.setTaskStatus(taskID,config.status.ACTIVE);
+        var packet = new TaskPacket(fs.readFileSync(taskID, "utf-8"), taskID, this.id, this.group);
+        this.messenger.publishToSelectedWorkers([sockid], "InputSplit", packet);
+    }
+
 }
 module.exports = Job;

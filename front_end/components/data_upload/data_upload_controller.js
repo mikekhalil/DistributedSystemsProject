@@ -29,7 +29,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
    
     $scope.upload = function (files, group_id, job_id) {
         if (files) {
-            console.log(files);
+            // console.log(files);
             Upload.upload({
                 url: 'http://localhost:8080/api/InputFiles/',
                 arrayKey: '',
@@ -43,10 +43,10 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
                 },
                 headers : {'x-access-token' : token }
             }).then(function (resp) {
-                console.log(JSON.stringify(resp.data));
+                // console.log(JSON.stringify(resp.data));
             }, null, function (evt) {
                 var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
-                console.log(evt.config.data);
+                // console.log(evt.config.data);
                 $scope.log = progressPercentage;
                 $scope.percentage = progressPercentage;
             });
@@ -80,14 +80,14 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
             data: {id: job_id, group: $scope.selectedGroup},
             headers: {'x-access-token': token }
         }).then(function(rsp) {
-            console.log(rsp.data);
-            console.log('uploading files');
+            // console.log(rsp.data);
+            // console.log('uploading files');
             $scope.upload($scope.allFiles,$scope.selectedGroup, job_id);
             // $scope.upload($scope.allFiles["mapFile"],'mapLog',"map",$scope.selectedGroup,job_id);
             // $scope.upload($scope.allFiles["reduceFile"],'reduceLog',"reduce",$scope.selectedGroup,job_id);
         },function(rsp) {  
-            console.log('err');
-            console.log(rsp.data);
+            // console.log('err');
+            // console.log(rsp.data);
         });
     }
 

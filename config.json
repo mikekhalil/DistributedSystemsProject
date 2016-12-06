@@ -4,7 +4,7 @@
         "data" : "dataFile",
         "type" : "typeOfInput"
     },
-    "components" : ["worker", "reducer", "manager", "server"],
+    "components" : ["worker", "reducer", "manager", "server", "group"],
     "REDUCE" : "reduce",
     "MAP" : "map",
     "DATA" : "data",

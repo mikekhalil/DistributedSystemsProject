@@ -16,12 +16,13 @@ class GroupManager {
                 that.users[group.name] = [];
             }
         });
+        
     }
 
     registerUser(user) {
         for(var group of user.group_ids)
             this.users[group].push(user);
-        this.updateGroupManager(); 
+       
     }
 
     removeUser(sock_id) {
@@ -36,26 +37,30 @@ class GroupManager {
             }
             
         });
-        this.updateGroupManager(); 
+       
     }
     
 
     registerGroup(group) {
         this.jobs[group.name] = group.jobs;
         this.users[group.name] = group.users;
+       
     }
 
-    registerJob(job, group_id) {
+    registerJob(job) {
+        var group_id = job.group;
+        console.log(group_id);
         if(this.jobs[group_id].length == 0)
             job.start(this);
         this.jobs[group_id].push(job);
+        
     }
 
     getJobs(group_id) {
         return this.jobs[group_id];
     }
 
-    getusers(group_id) {
+    getUsers(group_id) {
         return this.users[group_id];
     }
 
@@ -71,7 +76,9 @@ class GroupManager {
 
 
     getCurrentJob(group_id) {
-        if(jobs[group_id] && jobs[group_id].length > 0)
+        console.log(group_id);
+    
+        if(this.jobs[group_id] && this.jobs[group_id].length > 0)
             return this.jobs[group_id][0];
     }
 
@@ -84,13 +91,7 @@ class GroupManager {
         
 
     }
-    updateGroupManager() {
-        var msg = {}; 
-        msg.topic='GroupManagerUpdate'; 
-        msg.GroupManager = this; 
-        var dest = 'server'
-        socket.emit(dest, msg); 
-    }
+   
     dump() {
         console.log(this);
     }

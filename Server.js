@@ -141,8 +141,8 @@ apiRoutes.post('/InputFiles', function (req, res) {
 			res.json({err: err});
 			return;
 		}
-		console.log(req.files);
-		console.log(req.body);
+		// console.log(req.files);
+		// console.log(req.body);
 		const dir = path.join(__dirname,config.multer.path,req.body.group,req.body.job);
     	mkdirp(dir, function (err) {
     		if (err) console.error(err)
@@ -291,13 +291,13 @@ io.on('connection', function(socket) {
 	
 	//console.log('a client connected');
 	io.emit('clientTabUpdate' , ClientTab); 
-	io.emit('gmUpdate', GroupManager); 
+	
 
 
 	socket.on('register', function (msg) {
 		
 		registerClient(socket, msg); 
-		GroupManager.dump();
+		//GroupManager.dump();
 	}); 
 	socket.on('manager', function (msg) {
 		io.emit('manager' , msg); 
@@ -328,7 +328,7 @@ io.on('connection', function(socket) {
 		// console.log('A client disconnected'); 
 		// console.log(ClientTab); 
 		GroupManager.removeUser(socket.id);
-		GroupManager.dump();
+		//GroupManager.dump();
 		io.emit('clientTabUpdate' , ClientTab);
 	}); 
 	socket.on('server', function (msg){
@@ -359,7 +359,8 @@ io.on('connection', function(socket) {
 			io.emit('clientTabUpdate' , ClientTab);	
 		}
 		else if (msg.topic=="GroupManagerUpdate") {
-			GroupManager = msg.GroupManager;
+			console.log('......VHUTTTTTTTT!');
+			GroupManager.updateData(msg.GroupManager.jobs, msg.GroupManager.users);
 			io.emit('GroupManagerUpdate', GroupManager);  
 		}
 
@@ -383,9 +384,9 @@ function registerClient(socket, msg) {
 			groups: Groups
 		}; */ 
 		var user =  new Vorker(socket.id, msg.data); 
-		console.log(user);
-		GroupManager.registerUser(user); 
-		io.emit('GroupManagerUpdate', GroupManager); 
+		//console.log(user);
+		//GroupManager.registerUser(user); 
+		io.emit('GroupManagerRegister', user); 
 	}
 
 	

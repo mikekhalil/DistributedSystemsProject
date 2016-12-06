@@ -6,7 +6,7 @@
 var postal = require("postal");
 var _  = require("lodash"); 
 var config = require(__dirname + '/../config.json');
-var gm = require(__dirname + '/GroupManager.js'); 
+// var gm = require(__dirname + '/GroupManager.js'); 
 
 /*
 Module.ClientTab is a table of connected clients (connected to the inflection server)
@@ -33,7 +33,7 @@ for  'manager', 'reducer' , 'worker' and 'server'.
 module.exports = function (socket, channelname){
 	var module = {}; 
 	module.ClientTab = []; 
-	module.GroupManager = null; 
+	// module.GroupManager = new gm(); 
 
 	/*channels for incoming and outgoing traffic*/
 	module.inchannel = postal.channel("in" + channelname); 
@@ -121,9 +121,10 @@ module.exports = function (socket, channelname){
 		module.ClientTab = ClientTab;   
 	}); 
 
-	socket.on('GroupManagerUpdate' , function(GroupManager) {
-		module.GroupManager = GroupManager;   
-	}); 
+	// socket.on('GroupManagerUpdate' , function(GroupManager) {
+	// 	module.GroupManager.updateData(GroupManager.jobs, GroupManager.users);   
+	// 	//module.GroupManager.dump();
+	// }); 
 
 	return module;
 };

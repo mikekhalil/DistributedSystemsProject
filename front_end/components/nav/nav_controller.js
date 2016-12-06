@@ -1,8 +1,11 @@
-app.controller('navController', ['UserService','$rootScope','$scope','$localStorage','$http','$location',  function(User,$rootScope,$scope,$localStorage,$http,$location){
-    
-  
-        if ($localStorage.currentUser)
-            $scope.name = $localStorage.currentUser.username;
+app.controller('navController', ['User','$rootScope','$scope','$localStorage','$http','$location',  function(User,$rootScope,$scope,$localStorage,$http,$location){
+
+        
+        if (false){
+             //TO DO  -> root scope user data
+             var user = new User($localStorage.currentUser.token);
+        }
+             
         else
             $scope.name = "Welcome";
 

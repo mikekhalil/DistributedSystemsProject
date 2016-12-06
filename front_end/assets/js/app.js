@@ -33,15 +33,22 @@ app.config(function($routeProvider) {
     .run(run);
 
 
-  function run($rootScope, $http, $location, $localStorage) {
+  function run($rootScope, $http, $location, $localStorage, User) {
         // keep user logged in after page refresh
         if ($localStorage.currentUser) {
             //TODO FIX default header issues ideally
             $http.defaults.headers['x-access-token'] = $localStorage.currentUser.token;
-            $rootScope._user = $localStorage.currentUser;
-            console.log('new task handler');
-            th = new TaskHandler($localStorage.currentUser.userData);
-            th.start();
+            var user = new User($localStorage.currentUser.token);
+            user.getData((err,res) => {
+                if(err)
+                    console.log(err);
+                $rootScope._user = res;
+                console.log('new task handler');
+                var userData = {id : res.email, groups : res.groups};
+                th = new TaskHandler(res);
+                th.start();
+            });
+           
         }
         else {
             $rootScope._user = null;

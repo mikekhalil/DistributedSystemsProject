@@ -7,19 +7,21 @@ const path = require('path');
 const resourceManager = require(__dirname + '/modules/ClientManager.js');
 const JobManager = require(__dirname + '/modules/JobFactory.js');
 
-
+var GroupManager = require(__dirname + '/modules/GroupManager.js');
 var mongoose    = require('mongoose');
 var Group = require(__dirname + '/models/group');
 var JobSchema = require(__dirname + '/models/job.js');
-var Job = (__dirname + '/modules/Job');
+var Job = require(__dirname + '/modules/Job.js');
+
 
 
 mongoose.connect(config.mongodb.url);
 
+var gm = new  GroupManager(Group, messenger);
 
 
 socket.on('UploadedFile', function(files) {
-    console.log(files);
+    console.log('got files');
 
     JobSchema.findOne({name : files.job_id}, function(err,doc) {
         if(err) 
@@ -44,7 +46,12 @@ socket.on('UploadedFile', function(files) {
                     doc.save((err,doc) => {
                         if(err)
                             throw err;
+                        console.log('saved to db');
                         console.log(doc);
+                        var newJob = new Job(doc.name, doc.group, doc.status, doc.map, doc.reduce, doc.splits,messenger);
+                       
+                        gm.registerJob(newJob);
+                        //    constructor(id, group, messenger,status,mapper,reducer,splits) {
                     });
                 });
                 
@@ -57,12 +64,34 @@ socket.on('UploadedFile', function(files) {
 
 });
 
+socket.on("GroupManagerRegister", (user) =>{
+    console.log(user);
+    gm.registerUser(user);
+});
+
+socket.on("GroupManagerRemove", (user) => {
+    console.log(user);
+    gm.removeUser(user);
+});
+
 messenger.inchannel.subscribe("SystemReset" , function(msg) {
 	
 }); 
 
 messenger.inchannel.subscribe("Results", function(msg) {
     console.log(msg.data);
+    var group_id = msg.data.group_id;
+    console.log('AYYYYYYYYYYYYYYYYYY' + group_id);
+    var job = gm.getCurrentJob(group_id);
+    console.log(job);
+    if(job) {
+        gm.getCurrentJob(group_id).resultHandler(msg.data);
+
+    }
+    else {
+        //job is done
+    }
+    
 });
 
 messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {

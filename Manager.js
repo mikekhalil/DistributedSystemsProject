@@ -62,11 +62,20 @@ socket.on('UploadedFile', function(files) {
 });
 
 socket.on("GroupManagerRegister", (user) =>{
+    console.log(user);
     gm.registerUser(user);
 });
 
 socket.on("GroupManagerRemove", (user) => {
     gm.removeUser(user);
+});
+
+socket.on("GroupManagerJoinGroup", (msg) => {
+    //TODO: Add worker to group and assign task
+    var user = msg.user;
+    var group = msg.group;
+    console.log(user + "joined " + group);
+    
 });
 
 messenger.inchannel.subscribe("SystemReset" , function(msg) {
@@ -76,7 +85,18 @@ messenger.inchannel.subscribe("SystemReset" , function(msg) {
 messenger.inchannel.subscribe("Results", function(msg) {
     var group_id = msg.data.group_id;
     var job = gm.getCurrentJob(group_id);
-    var nextTask = job.resultHandler(msg.data);
+    if(job){
+        var nextTask = job.resultHandler(msg.data);
+        if(nextTask == null && job.isComplete()){
+            console.log('finished job');
+            gm.finishedJob(group_id);
+        }
+    }
+    else {
+        'might be ending job to quickly';
+    }
+   
+    
     // if (nextTask == null) {
     //     //job is done
     //     gm.finishedJob(group_id);

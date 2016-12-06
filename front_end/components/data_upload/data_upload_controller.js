@@ -80,14 +80,10 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
             data: {id: job_id, group: $scope.selectedGroup},
             headers: {'x-access-token': token }
         }).then(function(rsp) {
-            // console.log(rsp.data);
-            // console.log('uploading files');
             $scope.upload($scope.allFiles,$scope.selectedGroup, job_id);
-            // $scope.upload($scope.allFiles["mapFile"],'mapLog',"map",$scope.selectedGroup,job_id);
-            // $scope.upload($scope.allFiles["reduceFile"],'reduceLog',"reduce",$scope.selectedGroup,job_id);
         },function(rsp) {  
-            // console.log('err');
-            // console.log(rsp.data);
+            console.log('error?');
+            console.log(rsp.data);
         });
     }
 
@@ -97,7 +93,6 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
             method: "GET",
             headers: {'x-access-token' : token }
         }).then(function(rsp) {
-            console.log(rsp.data);
             $scope.user = rsp.data;
             $scope.myGroups = rsp.data.groups;
 

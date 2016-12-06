@@ -10,7 +10,6 @@ class MessageQueue {
 	}
 	start() {
 		var that = this;
-		console.log(that.user);
 		var channelname = 'worker'; 
 		that.messenger.publishToSelectedWorkers = function (recipient, topic,data) {
 				data = wrapData(channelname, "worker" ,topic, recipient, data); 

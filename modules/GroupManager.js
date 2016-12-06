@@ -20,6 +20,7 @@ class GroupManager {
     }
 
     registerUser(user) {
+        console.log(user);
         for(var group of user.group_ids){
             this.users[group].push(user);
             var job = this.getCurrentJob(group);
@@ -57,7 +58,7 @@ class GroupManager {
 
     registerJob(job) {
         var group_id = job.group;
-        console.log(this.jobs[group_id]);
+        console.log('adding job to group : ' + group_id);
         if(this.jobs[group_id].length == 0)
             job.start(this);
         this.jobs[group_id].push(job);
@@ -73,17 +74,14 @@ class GroupManager {
     }
 
     finishedJob(group_id) {
-        //TODO: Set job status to complete (in db) then check to see if otehr job is in queue
-        var completedJob = this.jobs[group_id].shift(); //equivalent to dequeue
         //check to see if another job is in the queue
-        console.log('finished job');
+        var completedJob = this.jobs[group_id].shift(); //equivalent to dequeue
         if (this.hasNextJob(group_id)) {
             var currentJob = this.getCurrentJob(group_id);
             currentJob.start(this);
             console.log('starting new job');
         }
     }
-
 
     getCurrentJob(group_id) {
         if(this.jobs[group_id] && this.jobs[group_id].length > 0)

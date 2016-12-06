@@ -235,6 +235,7 @@ apiRoutes.post('/joinGroup', function(req,res) {
 		}
 		else{
 			//save group to user
+			io.emit('GroupManagerJoinGroup', {user : doc.data.email, group : data.group });
 			doc.data.groups.push(data.group);
 			doc.save();
 			result.user = {success:true};
@@ -359,7 +360,6 @@ io.on('connection', function(socket) {
 			io.emit('clientTabUpdate' , ClientTab);	
 		}
 		else if (msg.topic=="GroupManagerUpdate") {
-			console.log('......VHUTTTTTTTT!');
 			GroupManager.updateData(msg.GroupManager.jobs, msg.GroupManager.users);
 			io.emit('GroupManagerUpdate', GroupManager);  
 		}
@@ -383,6 +383,7 @@ function registerClient(socket, msg) {
 			id: Id, 
 			groups: Groups
 		}; */ 
+		console.log(msg.data);
 		var user =  new Vorker(socket.id, msg.data); 
 		//console.log(user);
 		//GroupManager.registerUser(user); 

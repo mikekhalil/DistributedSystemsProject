@@ -1,4 +1,4 @@
-app.controller('loginController', ['UserService','$rootScope','$scope','$localStorage','$location','$http',  function(User,$rootScope,$scope,$localStorage,$location,$http){
+app.controller('loginController', ['$rootScope','$scope','$localStorage','$location','$http',  function($rootScope,$scope,$localStorage,$location,$http){
         
         closeModal = function(id) {
             $(id).modal('hide');
@@ -49,20 +49,10 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
             .then(function(rsp) {
                 // success
                 if (rsp.data.token) {
-                    console.log('what');
-                    // store username and token in local storage to keep user logged in between page refreshes
-                    console.log(rsp.data.user);
+                    //store current user data in local storage
                     $localStorage.currentUser = {userData:rsp.data.user, username: username, token: rsp.data.token };
-                    User.setUser($localStorage.currentUser);
-                    // add jwt token to auth header for all requests made by the $http service
                     $http.defaults.headers.common.Authorization = 'Bearer ' + rsp.data.token;
-                    $rootScope._user = $localStorage.currentUser;
-                    if(th == null) {
-                        th = new TaskHandler($localStorage.currentUser.userData);
-                        th.start();
-                    }
-
-                    // execute callback with true to indicate successful login
+                    $rootScope._user = rsp.data.user;
                     callback(true);
                 } 
                 else {
@@ -76,15 +66,6 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
              });
         }
  
-        function Deauthenticate() {
-            // remove user from local storage and clear http auth header
-            $rootScope._name = "";
-            delete $localStorage.currentUser;
-            if ($http.defaults) {
-                $http.defaults.headers.common.Authorization = '';
-            }
-            $location.path('/');
-        }
         function login() {
             Authenticate($scope.username, $scope.password, function (result) {
                 if (result === true) {
@@ -101,6 +82,5 @@ app.controller('loginController', ['UserService','$rootScope','$scope','$localSt
         var vm = this;
         vm.login = login;
         $scope.login = login;
-        $rootScope.logout = Deauthenticate;
 }]);
  

@@ -21,6 +21,8 @@ class Job {
         this.splits = splits;  
         this.messenger = messenger; 
         this.tasks = {};
+        this.count = 0;
+        this.length = splits.length;
     }
     
     setStatus(status) {
@@ -36,12 +38,8 @@ class Job {
     
         for(var worker of workers){
             var taskID = this.getNextTask();
-       
-            if(taskID != undefined) {
-                this.setTaskStatus(taskID,config.status.ACTIVE);
-                console.log('sending packet to : '  + worker.sock_id);
-                var packet = new TaskPacket(fs.readFileSync(taskID, "utf-8"), taskID, this.id, this.group);
-                this.messenger.publishToSelectedWorkers([worker.sock_id],"InputSplit", packet);
+            if(taskID) {
+                this.assignJobToWorker(taskID, worker.sock_id);
             }
         }
        
@@ -56,8 +54,10 @@ class Job {
         this.messenger.publishTo("worker", "MapReduce", packet);
         this.messenger.publishTo("reducer", "MapReduce", packet);
         for(var split of this.splits) {
-            var task = new Task(split, config.status.INCOMPLETE);
-            that.tasks[task.split] = task.status;
+            if(split){
+                var task = new Task(split, config.status.INCOMPLETE);
+                that.tasks[task.split] = task.status;
+            }
         }
     }
     printNumberOfTasks() {
@@ -88,7 +88,7 @@ class Job {
         return glob;
     }
     isComplete() {
-        return getNextTask() != null;
+        return this.count == this.length;
     }
 
     initalizeWorker(sockid) {
@@ -97,6 +97,8 @@ class Job {
     }
 
     assignJobToWorker(taskID,sockid){
+        this.count++;
+        console.log('job : ' + this.count + ' out of : ' + this.length);
         this.setTaskStatus(taskID,config.status.ACTIVE);
         var packet = new TaskPacket(fs.readFileSync(taskID, "utf-8"), taskID, this.id, this.group);
         this.messenger.publishToSelectedWorkers([sockid], "InputSplit", packet);

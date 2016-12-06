@@ -43,16 +43,11 @@ app.config(function($routeProvider) {
                 if(err)
                     console.log(err);
                 $rootScope._user = res;
-                console.log('new task handler');
-                var userData = {id : res.email, groups : res.groups};
-                th = new TaskHandler(res);
-                th.start();
             });
            
         }
         else {
             $rootScope._user = null;
-            th = null;
         }
  
         // redirect to login page if not logged in and trying to access a restricted page

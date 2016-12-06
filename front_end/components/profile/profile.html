@@ -1,5 +1,6 @@
 <div class="container">
-    <h1> {{cur.name}}'s profile </h1>
+    <h1> {{_user.name}}'s profile </h1>
+    <p> {{msg}} </p>
     <!--h3> {{ cur.name }} </h3-->
     <!--h3> {{cur.email}} <h3--> 
 
@@ -8,7 +9,7 @@
             <tr><h3> Groups </h3></tr>
         </thead>
         <tbody>
-            <tr ng-repeat="x in cur.groups">
+            <tr ng-repeat="x in _user.groups">
                 <td>{{x}}</td>
             </tr>
         </tbody>

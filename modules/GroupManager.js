@@ -76,7 +76,7 @@ class GroupManager {
 
 
     getCurrentJob(group_id) {
-        console.log(group_id);
+       
     
         if(this.jobs[group_id] && this.jobs[group_id].length > 0)
             return this.jobs[group_id][0];

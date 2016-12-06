@@ -79,18 +79,12 @@ messenger.inchannel.subscribe("SystemReset" , function(msg) {
 }); 
 
 messenger.inchannel.subscribe("Results", function(msg) {
-    console.log(msg.data);
     var group_id = msg.data.group_id;
-    console.log('AYYYYYYYYYYYYYYYYYY' + group_id);
     var job = gm.getCurrentJob(group_id);
-    console.log(job);
     if(job) {
         gm.getCurrentJob(group_id).resultHandler(msg.data);
+    }
 
-    }
-    else {
-        //job is done
-    }
     
 });
 

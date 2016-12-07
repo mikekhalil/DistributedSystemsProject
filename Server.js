@@ -168,8 +168,12 @@ apiRoutes.get('/user', function(req, res) {
 	});
 });   
 
-apiRoutes.get('/group', function(req,res) {
-	//TODO
+apiRoutes.post('/group', function(req,res) {
+	console.log(req.body);
+	JobSchema.find({group : req.body.group}, (err, doc) => {
+		if(!err)
+			res.json(doc);
+	});
 });
 
 

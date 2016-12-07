@@ -26,9 +26,9 @@ class GroupManager {
             var job = this.getCurrentJob(group);
             if(job) {
                 job.initalizeWorker(user.sock_id);
-                var taskID = job.getNextTask();
-                if(taskID){
-                    job.assignJobToWorker(taskID, user.sock_id);
+                var task = job.getNextTask();
+                if(task){
+                    job.assignTaskToWorker(task.split, user.sock_id);
                 }
             }
         }

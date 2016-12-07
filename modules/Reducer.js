@@ -47,7 +47,7 @@ var redisDump = function(client, job_id, group_id,dir,  cb) {
 	//dump job results to s3 bucket
 	var suffix = ':*';
 	var hash = job_id;
-	client.hgetall('test', (err,res) => {
+	client.hgetall(hash, (err,res) => {
 		if(err)
 			cb(err,null);	
 		dropIntoBucket(JSON.stringify(res,null,3),job_id + '-results.txt',(err,res) => {

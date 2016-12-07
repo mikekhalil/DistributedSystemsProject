@@ -8,8 +8,10 @@ app.service('TaskHandler', function($rootScope) {
             this.totalCount = {};   //progress for a job
             this.jobLength = {};    //length for a job
             this.socket = io();
+            this.rootScope._dashboardData = {};
             this.mq = new MessageQueue(this.socket, this.user);
             this.mq.start();
+            this.mq.messenger.publishTo('manager', 'DashboardDataRequest', {sock_id : this.socket.io.engine.id});
         }
         this.start = function() {
             var that = this;
@@ -23,6 +25,12 @@ app.service('TaskHandler', function($rootScope) {
                 that.nodeCount[packet.data.group_id] = 0;
             });
 
+            that.mq.messenger.inchannel.subscribe("DashboardData", function(packet) { 
+                //getting data for DashboardData
+                console.log(packet.data);
+                that.rootScope.$broadcast('DashboardUpdate', packet.data);
+            });
+
             that.mq.messenger.inchannel.subscribe("InputSplit", function(packet) {
                 console.log('InputSplit Received for Group : ' + packet.data.group_id);
                 that.nodeCount[packet.data.group_id] += 1;
@@ -33,11 +41,11 @@ app.service('TaskHandler', function($rootScope) {
                 var records = RecordReader(input, {type: "TextInputFormat"});
                 var ShuffledData = Mapper( that.mapper[group_id], records );
                 var ReducedData = Reducer( ShuffledData, that.reducer[group_id], null );
-                var reducerPacket = {data : ReducedData};
+                var reducerPacket = {data : ReducedData, group_id : packet.data.group_id, job_id : packet.data.job_id };
                 var managerPacket = {completed : true, sockid : that.socket.io.engine.id, inputSplit : packet.data.task, group_id : packet.data.group_id}
                 console.log(reducerPacket);
                 
-                //that.mq.messenger.publishTo('reducer','Results', ReducedData);
+                that.mq.messenger.publishTo('reducer','Results', reducerPacket);
                 that.mq.messenger.publishTo('manager', 'Results', managerPacket);
             });
         

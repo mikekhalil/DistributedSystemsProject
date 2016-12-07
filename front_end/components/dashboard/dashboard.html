@@ -5,7 +5,7 @@
 </ul-->
 
 <div class="card card-nav-tabs">
-  <div class="card-header" data-background-color="purple">
+  <div class="card-header" data-background-color="green">
     <div class="nav-tabs-navigation">
       <div class="nav-tabs-wrapper">
         <span class="nav-tabs-title">Groups:</span>
@@ -25,24 +25,37 @@
 
           <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="card card-stats">
-              <div class="card-header" data-background-color="orange">
+              <div class="card-header" data-background-color="blue">
                 <i class="material-icons">account_circle</i>
               </div>
               <div class="card-content">
                 <p class="category">Users Online</p>
-                <h3 class="title">49/50</h3>
+             
+                <h3 class="title">{{_dashboardData.users[group].length}}</h3>
               </div>
             </div>
           </div>
 
           <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="card card-stats">
-              <div class="card-header" data-background-color="green">
+              <div class="card-header" data-background-color="blue">
                 <i class="material-icons">check_circle</i>
               </div>
               <div class="card-content">
                 <p class="category">Jobs Finished</p>
                 <h3 class="title">34,245</h3>
+              </div>
+            </div>
+          </div>
+
+            <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-stats">
+              <div class="card-header" data-background-color="blue">
+                <i class="material-icons">watch_later</i>
+              </div>
+              <div class="card-content">
+                <p class="category">Time Elapsed for Job</p>
+                <h3 class="title"> 3:43 </h3>
               </div>
             </div>
           </div>
@@ -54,15 +67,15 @@
 </div>
 
 <div class="row">
-  <div class="col-lg-6 col-md-12">
+  <div class="col-lg-4 col-md-12">
     <div class="card">
       <div class="card-header" data-background-color="red">
-        <h4 class="title">Active Jobs</h4>
-        <p class="category">New employees on 15th September, 2016</p>
+        <h4 class="title">Active Job Queue</h4>
+        <p class="category">Computations that this group will perform</p>
       </div>
       <div class="card-content table-responsive">
         <table class="table table-hover">
-          <thead class="text-danger">
+          <thead>
             <tr>
               <th>ID</th>
               <th>Name</th>
@@ -71,40 +84,77 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr ng-repeat="x in _dashboardData.jobs[group]">
+                <td>{{$index}}</td>
+                <td> {{x.id}}</td>
+                <td> {{x.splits.length}}</td>
+            </tr>
+            <!--<tr>
               <td>1</td>
               <td>AliceWonderland</td>
               <td>36,738</td>
               <td>Paul</td>
-            </tr>
+            </tr>-->
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-    <div class="col-lg-6 col-md-12">
+  <div class="col-lg-4 col-md-12">
     <div class="card">
-      <div class="card-header" data-background-color="green">
-        <h4 class="title">Completed Jobs</h4>
-        <p class="category">New employees on 15th September, 2016</p>
+      <div class="card-header" data-background-color="red">
+        <h4 class="title">Main Reducer Queue</h4>
+        <p class="category">Reduce Computations for the Main Reducer</p>
       </div>
       <div class="card-content table-responsive">
         <table class="table table-hover">
-          <thead class="text-success">
+          <thead >
             <tr>
-              <th>ID</th>
+              <th>Index</th>
               <th>Name</th>
               <th>Tasks</th>
               <th>Owner</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>2</td>
-              <td>Harry Potter</td>
-              <td>362,738</td>
+            <tr ng-repeat="x in _dashboardData.jobs[group]">
+                <td>{{$index}}</td>
+                <td> {{x.id}}</td>
+                <td> {{x.splits.length}}</td>
+            </tr>
+            <!--<tr>
+              <td>1</td>
+              <td>AliceWonderland</td>
+              <td>36,738</td>
               <td>Paul</td>
+            </tr>-->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+    <div class="col-lg-4 col-md-12">
+    <div class="card">
+      <div class="card-header" data-background-color="red">
+        <h4 class="title">Completed Jobs</h4>
+        <p class="category">New employees on 15th September, 2016</p>
+      </div>
+      <div class="card-content table-responsive">
+        <table class="table table-hover">
+          <thead >
+            <tr>
+              <th>Name</th>
+              <th>Owner</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Harry Potter</td>
+              <td>Potato Man</td>
+              <td><a href="http://www.w3schools.com" target="_blank">Result File</a> </td>
             </tr>
           </tbody>
         </table>
@@ -115,8 +165,8 @@
 
  <div class="card">
       <div class="card-header" data-background-color="orange">
-        <h4 class="title">Completed Jobs</h4>
-        <p class="category">New employees on 15th September, 2016</p>
+        <h4 class="title">Current Job Processing</h4>
+        <p class="category">Comparing cluster performance vs Individual Node Performance</p>
       </div>
       <div class="card-content">
 <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
@@ -141,7 +191,7 @@ $(function () {
         },
         yAxis: {
             title: {
-                text: 'Temperature (°C)'
+                text: 'Tasks Computed per Second (16kb task)'
             },
             plotLines: [{
                 value: 0,

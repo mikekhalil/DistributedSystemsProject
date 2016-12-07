@@ -6,15 +6,16 @@ var reducer = require(__dirname + '/modules/Reducer.js');
 const path = require('path');
 var redis = require('redis');
 var RedisClient = redis.createClient(6379,"198.199.123.85"); //creates a new client
+var ReducerManager = require(__dirname + '/modules/ReducerManager.js');
+var mongoose    = require('mongoose');
+var Group = require(__dirname + '/models/group.js');
+var Job = require(__dirname + '/models/job.js');
+mongoose.connect(config.mongodb.url);7
+
+var rm = new ReducerManager(Group);
 
 
-//TODO (jobid and groupid will need to be in packet data now) as well as count + length
-var JobTracker = {
-	test  : {
-		count: 0,
-		length: 127
-	}
-};
+
 
 RedisClient.on('connect', function() {
 	RedisClient.auth(config.redis.password, function(err) {
@@ -32,18 +33,33 @@ RedisClient.on('error', function(err) {
 	console.log(err);
 });
 
+socket.on("RegisterGroup", (group) => {
+	rm.registerGroup(group.name)
+});
+
+
+
 messenger.inchannel.subscribe("MapReduce", function(msg) {
-    reduceFunc = new Function('key','value',msg.data.reducer);
+	console.log(msg);
+	var job = msg.data;
+	rm.registerJob(job);
+});
+
+messenger.inchannel.subscribe("RegisterGroup", function(msg) { 
+	console.log(msg.data);
 });
 
 
 messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
-		var job_id = 'test';
-		var group_id = 'another test';
-		reducer.redisReduce(RedisClient,job_id,group_id, msg.data, reduceFunc, function() {
-			JobTracker[job_id].count += 1;
-			console.log('count: ' + JobTracker[job_id].count);
-			if(JobTracker[job_id].count === JobTracker[job_id].length) {
+		var data = msg.data.data;
+		var group_id = msg.data.group_id;
+		var job_id = msg.data.job_id;
+		var reduceFunc = rm.getJob(group_id, job_id).reducer;
+		reducer.redisReduce(RedisClient,job_id,group_id, data, reduceFunc, function() {
+			rm.incrementCount(group_id,job_id);
+			console.log(job_id + " : " + rm.getJob(group_id,job_id).count); 
+			
+			if(rm.isComplete(group_id,job_id)) {
 			 	console.log('completed entire job');
 			 	//TODO : Clean Up Redis Hash for particular job ID
 				var dir = path.join(__dirname, config.multer.path, group_id, job_id);

@@ -93,6 +93,7 @@ apiRoutes.post('/registerGroup', function(req,res) {
 			res.json({success : false, error : err});
 		}
 		res.json({success : true });
+		io.emit("RegisterGroup", newGroup);
 	});
 
 	User.findOne({'data.email': user.email}, function(err, doc) {
@@ -178,7 +179,7 @@ apiRoutes.post('/group', function(req,res) {
 
 
 apiRoutes.post('/registerJob', function(req,res) {
-	console.log(req.decoded._doc.data.email);
+	//console.log(req.decoded._doc.data.email);
 	var newJob = new JobSchema({
 		name: req.body.id,  
     	owners: [req.decoded._doc.data.email], 
@@ -256,7 +257,7 @@ apiRoutes.post('/joinGroup', function(req,res) {
 
 app.post('/authenticate', function(req, res) {
 	// find the user
-	console.log(req.body);
+	//console.log(req.body);
 	
 	User.findOne({'data.email' : req.body.email}, function(err, user) {
 		if (err) 
@@ -332,8 +333,9 @@ io.on('connection', function(socket) {
 		}
 		// console.log('A client disconnected'); 
 		// console.log(ClientTab); 
-		GroupManager.removeUser(socket.id);
+		//GroupManager.removeUser(socket.id);
 		//GroupManager.dump();
+		io.emit('RemoveUser', socket.id);
 		io.emit('clientTabUpdate' , ClientTab);
 	}); 
 	socket.on('server', function (msg){
@@ -387,7 +389,6 @@ function registerClient(socket, msg) {
 			id: Id, 
 			groups: Groups
 		}; */ 
-		console.log(msg.data);
 		var user =  new Vorker(socket.id, msg.data); 
 		//console.log(user);
 		//GroupManager.registerUser(user); 

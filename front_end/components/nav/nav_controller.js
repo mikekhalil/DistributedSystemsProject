@@ -1,5 +1,12 @@
 app.controller('navController', ['TaskHandler','User','$rootScope','$scope','$localStorage','$http','$location',  function(TaskHandler,User,$rootScope,$scope,$localStorage,$http,$location){
-
+    $scope.$on('DashboardUpdate', (event,data) =>{
+        $scope.$apply(()=> {
+            console.log('broadcast\n\n\n\n AYY');
+            console.log(data);
+            $rootScope._dashboardData = data;
+        });
+       
+    });
   
     $rootScope.$watch('_user', () => {
         if($rootScope._user) {

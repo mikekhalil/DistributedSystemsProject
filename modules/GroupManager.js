@@ -20,9 +20,8 @@ class GroupManager {
     }
 
     registerUser(user) {
-        console.log(user);
         for(var group of user.group_ids){
-            this.users[group].push(user);
+            this.users[group].push({sock_id : user.sock_id, user_id: user.user_id});
             var job = this.getCurrentJob(group);
             if(job) {
                 job.initalizeWorker(user.sock_id);

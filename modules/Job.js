@@ -12,7 +12,7 @@ var fs = require('fs');
 
 
 class Job {
-    constructor(id, group, status,mapper,reducer,splits, messenger) {
+    constructor(id, group, status,mapper,reducer,splits, messenger, owners) {
         this.id = id;
         this.group = group;
         this.status = status;
@@ -23,6 +23,7 @@ class Job {
         this.tasks = {};
         this.count = 0;
         this.length = splits.length;
+        this.owners = owners;
     }
     
     setStatus(status) {

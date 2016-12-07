@@ -45,9 +45,11 @@ socket.on('UploadedFile', function(files) {
                     doc.save((err,doc) => {
                         if(err)
                             throw err;
-                        var newJob = new Job(doc.name, doc.group, doc.status, doc.map, doc.reduce, doc.splits,messenger);
+                        var newJob = new Job(doc.name, doc.group, doc.status, doc.map, doc.reduce, doc.splits,messenger, doc.owners);
                        
                         gm.registerJob(newJob);
+                        messenger.publishTo("worker", "DashboardData", {users: gm.users, jobs : gm.jobs});
+                       
                         //    constructor(id, group, messenger,status,mapper,reducer,splits) {
                     });
                 });
@@ -61,21 +63,41 @@ socket.on('UploadedFile', function(files) {
 
 });
 
+
+
 socket.on("GroupManagerRegister", (user) =>{
-    console.log(user);
     gm.registerUser(user);
+    messenger.publishTo("worker", "DashboardData", {users: gm.users, jobs : gm.jobs});
 });
 
 socket.on("GroupManagerRemove", (user) => {
     gm.removeUser(user);
+    messenger.publishTo("worker", "DashboardData", {users: gm.users, jobs : gm.jobs});
 });
 
 socket.on("GroupManagerJoinGroup", (msg) => {
-    //TODO: Add worker to group and assign task
+    //TODO: Add worker to group and assign task THIS WILL REQUIRE NEW DATA STRUCTURE MOST LIKELY 
     var user = msg.user;
     var group = msg.group;
     console.log(user + "joined " + group);
     
+});
+
+socket.on("RemoveUser", (sock_id) => {
+    gm.removeUser(sock_id);
+    messenger.publishTo("worker", "DashboardData", {users: gm.users, jobs : gm.jobs});
+});
+
+
+socket.on("RegisterGroup", (group) => {
+	//TODO THIS WILL REQUIRE NEW DATA STRUCTURE MOST LIKELY 
+    //rm.registerGroup(group.name)
+});
+
+
+messenger.inchannel.subscribe("DashboardDataRequest", function(msg) {
+    var sock_id = msg.data.sock_id;
+    messenger.publishToSelectedWorkers([sock_id], "DashboardData", {users : gm.users, jobs : gm.jobs });
 });
 
 messenger.inchannel.subscribe("SystemReset" , function(msg) {

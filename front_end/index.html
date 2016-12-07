@@ -8,6 +8,7 @@
         <script src="assets/libs/ng-file-upload.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.6/ngStorage.min.js"></script>
         <script src="assets/js/app.js"></script>
+        <script src="assets/js/User.js"></script>
      
 
         <!-- postal / socket.io / messenger requirements -->
@@ -30,6 +31,7 @@
         <script src="assets/js/Reducer/Reducer.js"></script>
         <script src="assets/js/Mapper/Mapper.js"></script>
         <script src="assets/js/Main.js"></script>
+       
 
         <!-- dashboard theme -->
         <link href="assets/vendor/bootstrap.min.css" rel="stylesheet" />
@@ -45,7 +47,7 @@
             <div class="sidebar" ng-controller="navController" data-color="green" data-image="assets/img/sidebar-1.jpg">
                 <div class="logo">
                     <a ng-href="#/" class="simple-text">
-                        {{ _user.username || "Welcome"}}
+                        {{ _user.name || "Welcome"}}
                     </a>
                 </div>
 

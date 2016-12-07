@@ -16,10 +16,14 @@ var jwt    = require('jsonwebtoken');
 var User   = require(__dirname + '/models/user'); // get our mongoose model
 var Group = require(__dirname + '/models/group');
 var _  = require("lodash"); 
-    
+var gm = require(__dirname + '/modules/GroupManager.js'); 
+var Vorker = require(__dirname + '/modules/User.js'); 
+var JobSchema = require(__dirname + '/models/job.js');
+var mkdirp = require('mkdirp');
 
-/*globals*/
-var ClientTab = []; 
+
+var ClientTab = [];  
+var GroupManager = new gm(Group); 
 
 var apiRoutes = express.Router(); 
 app.use(express.static(__dirname + '/front_end'));
@@ -133,24 +137,25 @@ apiRoutes.get('/groups', function(req,res) {
 
 apiRoutes.post('/InputFiles', function (req, res) {
     fileUpload.upload(req,res,function(err){
-        //send response to client
-		var dir = path.join(__dirname,config.multer.path,req.body.type);
-		if(!fs.existsSync(dir)){
-             fs.mkdirSync(dir);
-        }
-
-        if(err){
-                res.json({error_code:1,err_desc:err});
-                return;
-        }
-
-        res.json({error_code:0,err_desc:null});
-        fs.renameSync(req.file.path,path.join(dir, req.file.filename));
-
-
-		//just send path to data file
-		var payload = {type : req.body.type, data : path.join(dir,req.file.filename)};
-		io.emit('UploadedFile', payload);
+		if(err){
+			res.json({err: err});
+			return;
+		}
+		// console.log(req.files);
+		// console.log(req.body);
+		const dir = path.join(__dirname,config.multer.path,req.body.group,req.body.job);
+    	mkdirp(dir, function (err) {
+    		if (err) console.error(err)
+			else {
+				for(var file of req.files) {
+					fs.renameSync(file.path,path.join(dir,file.originalname));
+				}
+				res.json({error_code:0,err_desc:null});
+				console.log('sending files to manager');
+				var payload = {map: path.join(dir,req.body.map), data : path.join(dir,req.body.data), reduce: path.join(dir,req.body.reduce), group_id: req.body.group, job_id: req.body.job};
+		 		io.emit('UploadedFile', payload);
+			}
+		});
     })
 });
 
@@ -163,13 +168,40 @@ apiRoutes.get('/user', function(req, res) {
 	});
 });   
 
-apiRoutes.get('/group', function(req,res) {
-	//TODO
+apiRoutes.post('/group', function(req,res) {
+	console.log(req.body);
+	JobSchema.find({group : req.body.group}, (err, doc) => {
+		if(!err)
+			res.json(doc);
+	});
+});
+
+
+apiRoutes.post('/registerJob', function(req,res) {
+	console.log(req.decoded._doc.data.email);
+	var newJob = new JobSchema({
+		name: req.body.id,  
+    	owners: [req.decoded._doc.data.email], 
+		group : req.body.group,
+    	map : null,       
+    	reduce: null,     
+    	status: config.status.INCOMPLETE,     
+    	results: null,    
+    	splits : [],   
+    	data: null
+	});
+	newJob.save(function(err) {
+		if(err) {
+			console.log(err);
+			res.json({success : false, error : err});
+		}
+		res.json({success : true });
+	});
 });
 
 
 apiRoutes.post('/joinGroup', function(req,res) {
-	//TODO join group 
+	//TODO jupdate groupManager
 	//update user and group documents
 	var user = req.decoded._doc.data;
 	var data = req.body;
@@ -207,6 +239,7 @@ apiRoutes.post('/joinGroup', function(req,res) {
 		}
 		else{
 			//save group to user
+			io.emit('GroupManagerJoinGroup', {user : doc.data.email, group : data.group });
 			doc.data.groups.push(data.group);
 			doc.save();
 			result.user = {success:true};
@@ -246,7 +279,8 @@ app.post('/authenticate', function(req, res) {
 				//send token
 				res.json({
 					success: true,
-					token: token
+					token: token,
+					user : user.data
 				});
 			}   
 		}
@@ -262,9 +296,13 @@ io.on('connection', function(socket) {
 	
 	//console.log('a client connected');
 	io.emit('clientTabUpdate' , ClientTab); 
+	
+
 
 	socket.on('register', function (msg) {
+		
 		registerClient(socket, msg); 
+		//GroupManager.dump();
 	}); 
 	socket.on('manager', function (msg) {
 		io.emit('manager' , msg); 
@@ -285,7 +323,7 @@ io.on('connection', function(socket) {
 			//console.log("CREAM");
 			io.emit('worker', msg); 
 		}
-	});
+	}); 
 	socket.on('disconnect' , function (){
 		for (x in ClientTab) {
 			if (ClientTab[x].sockid == socket.id) {
@@ -294,10 +332,12 @@ io.on('connection', function(socket) {
 		}
 		// console.log('A client disconnected'); 
 		// console.log(ClientTab); 
+		GroupManager.removeUser(socket.id);
+		//GroupManager.dump();
 		io.emit('clientTabUpdate' , ClientTab);
 	}); 
 	socket.on('server', function (msg){
-		if (msg.topic=="StartedMapReduce") {
+		if (msg.topic=="MapReduce") {
 			for (var i in ClientTab) {
 				if (ClientTab[i].sockid == socket.id)  {
 					ClientTab[i].status = "active"; 
@@ -323,6 +363,10 @@ io.on('connection', function(socket) {
 			}
 			io.emit('clientTabUpdate' , ClientTab);	
 		}
+		else if (msg.topic=="GroupManagerUpdate") {
+			GroupManager.updateData(msg.GroupManager.jobs, msg.GroupManager.users);
+			io.emit('GroupManagerUpdate', GroupManager);  
+		}
 
 	}); 
 }); 
@@ -333,7 +377,26 @@ function registerClient(socket, msg) {
 			status: "idle", 
 			role: msg.sender
 		});
+
 	io.emit('clientTabUpdate' , ClientTab);
+
+
+
+	if (msg.sender.toLowerCase() == "worker") {
+		/*msg.data = {
+			id: Id, 
+			groups: Groups
+		}; */ 
+		console.log(msg.data);
+		var user =  new Vorker(socket.id, msg.data); 
+		//console.log(user);
+		//GroupManager.registerUser(user); 
+		io.emit('GroupManagerRegister', user); 
+	}
+
+	
+	
 }
+
 
 

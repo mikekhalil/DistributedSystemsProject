@@ -1,10 +1,14 @@
-app.controller('navController', ['UserService','$rootScope','$scope','$localStorage','$http','$location',  function(User,$rootScope,$scope,$localStorage,$http,$location){
-    
+app.controller('navController', ['TaskHandler','User','$rootScope','$scope','$localStorage','$http','$location',  function(TaskHandler,User,$rootScope,$scope,$localStorage,$http,$location){
+
   
-        if ($localStorage.currentUser)
-            $scope.name = $localStorage.currentUser.username;
-        else
-            $scope.name = "Welcome";
+    $rootScope.$watch('_user', () => {
+        if($rootScope._user) {
+            TaskHandler.init($rootScope);
+            TaskHandler.start();
+        }
+    });
+
+
 
     $scope.logout =   function () {
             // remove user from local storage and clear http auth header
@@ -14,6 +18,11 @@ app.controller('navController', ['UserService','$rootScope','$scope','$localStor
                 $http.defaults.headers.common.Authorization = '';
             }
             $location.path('/');
+            console.log('logged out');
+            if(TaskHandler.socket) {
+                //TaskHandler has been activated - disconnect from socket server
+                TaskHandler.socket.disconnect();
+            }
     }
     $scope.isActive = function(path) {
 

@@ -1,3 +1,4 @@
+var th = null;
 var app = angular.module('cream',['ngStorage','ngRoute','ngFileUpload']);
 
 app.config(function($routeProvider) {
@@ -32,12 +33,18 @@ app.config(function($routeProvider) {
     .run(run);
 
 
-  function run($rootScope, $http, $location, $localStorage) {
+  function run($rootScope, $http, $location, $localStorage, User) {
         // keep user logged in after page refresh
         if ($localStorage.currentUser) {
             //TODO FIX default header issues ideally
             $http.defaults.headers['x-access-token'] = $localStorage.currentUser.token;
-            $rootScope._user = $localStorage.currentUser;
+            var user = new User($localStorage.currentUser.token);
+            user.getData((err,res) => {
+                if(err)
+                    console.log(err);
+                $rootScope._user = res;
+            });
+           
         }
         else {
             $rootScope._user = null;

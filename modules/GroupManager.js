@@ -1,52 +1,107 @@
+'use strict'; 
+
+var socket = require('socket.io-client')('http://localhost:8080'); 
+
 class GroupManager {
-    constructor(db){
+    constructor(Group){
         this.jobs = {};
-        this.workers = {};
-        db.jobs.find({}, function(err,groups) {
+        this.users = {};
+        var that = this;
+        Group.find({}, function(err,groups) {
             if(err)
                 throw err;
-            console.log(groups);
+            
+            for(var group of groups) {
+                that.jobs[group.name] = [];
+                that.users[group.name] = [];
+            }
         });
+        
     }
 
-    registerWorker(worker) {
-        for(var group of worker.groups)
-            this.workers[group.name].push(worker);
+    registerUser(user) {
+        console.log(user);
+        for(var group of user.group_ids){
+            this.users[group].push(user);
+            var job = this.getCurrentJob(group);
+            if(job) {
+                job.initalizeWorker(user.sock_id);
+                var task = job.getNextTask();
+                if(task){
+                    job.assignTaskToWorker(task.split, user.sock_id);
+                }
+            }
+        }
     }
+
+    removeUser(sock_id) {
+        console.log('removing ' + sock_id);
+        var that = this;
+        Object.keys(this.users).forEach(function(key) {
+            var users = that.users[key]
+            for (var user in users) {
+                if (users[user].sock_id == sock_id) {
+                   that.users[key].splice(user, 1); 
+                }
+            }
+            
+        });
+       
+    }
+    
 
     registerGroup(group) {
         this.jobs[group.name] = group.jobs;
-        this.workers[group.name] = group.users;
+        this.users[group.name] = group.users;
+       
     }
 
-    registerJob(job, group_id) {
+    registerJob(job) {
+        var group_id = job.group;
+        console.log('adding job to group : ' + group_id);
         if(this.jobs[group_id].length == 0)
-            job.start();
+            job.start(this);
         this.jobs[group_id].push(job);
+        
     }
 
     getJobs(group_id) {
         return this.jobs[group_id];
     }
 
-    getWorkers(group_id) {
-        return this.workers[group_id];
+    getUsers(group_id) {
+        return this.users[group_id];
     }
 
     finishedJob(group_id) {
-        var job = this.jobs[group_id].shift(); //equivalent to dequeue
+        //check to see if another job is in the queue
+        var completedJob = this.jobs[group_id].shift(); //equivalent to dequeue
+        if (this.hasNextJob(group_id)) {
+            var currentJob = this.getCurrentJob(group_id);
+            currentJob.start(this);
+            console.log('starting new job');
+        }
     }
 
-    getNextJob(group_id) {
-        if(jobs[group_id] && jobs[group_id].length > 0)
+    getCurrentJob(group_id) {
+        if(this.jobs[group_id] && this.jobs[group_id].length > 0)
             return this.jobs[group_id][0];
     }
 
     hasNextJob(group_id) {
-         return this.getJobs(groupid) > 0;
+         return this.getJobs(group_id).length > 0;
     }
     
     startJobs() {
-        //start jobs for each group on server start
+        //TODO: start jobs for each group on server start
+        
+
     }
+   
+    dump() {
+        console.log(this);
+    }
+
 }
+
+module.exports = GroupManager; 

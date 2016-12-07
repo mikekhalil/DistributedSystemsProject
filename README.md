@@ -1,6 +1,6 @@
 # Hadude
 
-This is a cross platform, distruted computing platform that allows users to solve fairly large problems over several machines
+This is a browser-based, distruted computing platform that allows users to solve fairly large problems over many machines
 
 # Requirements
     Node 

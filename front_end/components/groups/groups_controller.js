@@ -80,20 +80,13 @@ app.controller('groupsController', ['$rootScope','$location', '$route', '$scope'
 			method: "GET",
 			headers: {'x-access-token' : token }
 		}).then(function(rsp) {
-			console.log(rsp.data);
 			$scope.myGroups = rsp.data.groups;
-
+			$scope.getGroups();
 		},function(rsp) {
 			console.log(rsp);
 		});
 	}
 
 	$scope.getUser();
-	$scope.getGroups();
+	
 }]);
-
-/*
-app.controller('groupsController', ['$scope', function($scope) {
-  $scope.double = function(value) { return value * 2; };
-}]);
-*/

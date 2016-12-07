@@ -6,6 +6,7 @@
 var postal = require("postal");
 var _  = require("lodash"); 
 var config = require(__dirname + '/../config.json');
+// var gm = require(__dirname + '/GroupManager.js'); 
 
 /*
 Module.ClientTab is a table of connected clients (connected to the inflection server)
@@ -32,6 +33,7 @@ for  'manager', 'reducer' , 'worker' and 'server'.
 module.exports = function (socket, channelname){
 	var module = {}; 
 	module.ClientTab = []; 
+	// module.GroupManager = new gm(); 
 
 	/*channels for incoming and outgoing traffic*/
 	module.inchannel = postal.channel("in" + channelname); 
@@ -39,15 +41,10 @@ module.exports = function (socket, channelname){
 
 	/*route outgoing messages to socket.io server*/ 
 	module.outchannel.subscribe("outgoing", function (data) {
-		//console.log("outgoing"); 
 		socket.emit(data.reciever, data); 
     });
 	/*recieve incoming messages and re-establish original topic*/ 
     module.inchannel.subscribe("incoming", function (data) {
-    	//console.log("incoming"); 
-		// console.log(data.data.sockid);
-		// console.log(data.data.inputSplit);
-		// console.log('=-=-=-=-=-=-=-');
     	module.inchannel.publish(data.topic, data); 
     }); 
     /*publish array of sockids as recipients*/ 
@@ -97,7 +94,6 @@ module.exports = function (socket, channelname){
 		return idle; 
 	}
 
-
 	/*print clientTab*/ 
 	module.printConnections = function () {
 		console.log("Inflection Server connected to ...")
@@ -121,9 +117,14 @@ module.exports = function (socket, channelname){
 	/*recieve update client tab from socketserver 
 	ISSUE: error checking is dog shit
 	*/ 
-	socket.on('clientTabUpdate' , function(msg) {
-		module.ClientTab = msg; 
+	socket.on('clientTabUpdate' , function(ClientTab) {
+		module.ClientTab = ClientTab;   
 	}); 
+
+	// socket.on('GroupManagerUpdate' , function(GroupManager) {
+	// 	module.GroupManager.updateData(GroupManager.jobs, GroupManager.users);   
+	// 	//module.GroupManager.dump();
+	// }); 
 
 	return module;
 };

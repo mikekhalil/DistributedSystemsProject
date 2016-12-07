@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "prestart": "npm install",
-    "start": "mkdir InputFiles && node Server.js"
+    "start": "mkdir -p InputFiles && node Server.js"
   },
   "contributors": [
     {
@@ -22,12 +22,16 @@
   "description": "A cross platform, distributed computing solution",
   "dependencies": {
     "bluebird": "3.4.6",
+
+    "aws-sdk": "2.7.10",
+
     "body-parser": "1.15.2",
     "event-stream": "3.3.4",
     "express": "4.14.0",
+    "jsonfile": "2.4.0",
     "jsonwebtoken": "7.1.9",
     "lodash": "4.16.3",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "0.5.1",
     "mongodb": "2.2.10",
     "mongoose": "4.6.2",
     "morgan": "1.7.0",

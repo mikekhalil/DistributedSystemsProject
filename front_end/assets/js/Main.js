@@ -27,13 +27,14 @@ app.service('TaskHandler', function($rootScope) {
                 console.log('InputSplit Received for Group : ' + packet.data.group_id);
                 that.nodeCount[packet.data.group_id] += 1;
                 that.rootScope.$broadcast('InputSplitUpdate', that.nodeCount);
+                
                 var input = packet.data.fileData;
                 var group_id = packet.data.group_id;
                 var records = RecordReader(input, {type: "TextInputFormat"});
                 var ShuffledData = Mapper( that.mapper[group_id], records );
                 var ReducedData = Reducer( ShuffledData, that.reducer[group_id], null );
                 var reducerPacket = {data : ReducedData};
-                var managerPacket = {completed : true, sockid : that.socket.io.engine.id, inputSplit : packet.data.inputSplit, group_id : packet.data.group_id}
+                var managerPacket = {completed : true, sockid : that.socket.io.engine.id, inputSplit : packet.data.task, group_id : packet.data.group_id}
                 console.log(reducerPacket);
                 
                 //that.mq.messenger.publishTo('reducer','Results', ReducedData);

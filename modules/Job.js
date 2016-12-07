@@ -37,51 +37,51 @@ class Job {
         this.printNumberOfTasks();
     
         for(var worker of workers){
-            var taskID = this.getNextTask();
-            if(taskID) {
-                this.assignJobToWorker(taskID, worker.sock_id);
+            var task = this.getNextTask();
+            if(task) {
+                this.assignTaskToWorker(task.split, worker.sock_id);
             }
         }
        
 
     }
-    setTaskStatus(task_id,status) {
-        this.tasks[task_id] = status;
-    }
+    // setTaskStatus(task_id,status) {
+    //     this.tasks[task_id] = status;
+    // }
     setUpJob(){
         var that = this;
-        var packet = new InitialPacket(this.mapper,this.reducer,this.id,this.group);
+        var packet = new InitialPacket(this.mapper,this.reducer,this.id,this.group,this.length);
         this.messenger.publishTo("worker", "MapReduce", packet);
         this.messenger.publishTo("reducer", "MapReduce", packet);
         for(var split of this.splits) {
             if(split){
                 var task = new Task(split, config.status.INCOMPLETE);
-                that.tasks[task.split] = task.status;
+                that.tasks[task.split] = task;
             }
         }
     }
     printNumberOfTasks() {
-        console.log('number of tasks for job [' + this.id + ']: ' + Object.keys(this.tasks).length);
+        console.log('number of tasks for job [' + this.id + ']: ' + this.length);
     }
     resultHandler(res) {
         //console.log(res);
         //TODO: Add a timeout featue - if job has been active for more tha X seconds, update it to not active - assign job to another node
         var sockid = res.sockid;
         var completedTask = this.tasks[res.inputSplit];
-        this.setTaskStatus(res.inputSplit,config.status.COMPLETE);
-        var taskID = this.getNextTask();
+        this.tasks[completedTask.split].setStatus(config.status.COMPLETE);
+        var task = this.getNextTask();
         
-        if (taskID) {
-            this.assignJobToWorker(taskID, sockid);
+        if (task) {
+            this.assignTaskToWorker(task.split, sockid);
         }
-        return taskID;    
+        return task;    
     }
     getNextTask(){
         var glob = null;
         Object.keys(this.tasks).forEach((key) => {
-            var status = this.tasks[key];
+            var status = this.tasks[key].status;
             if(status == config.status.INCOMPLETE){
-                glob = key;
+                glob = this.tasks[key];
             }
         });
        
@@ -92,15 +92,15 @@ class Job {
     }
 
     initalizeWorker(sockid) {
-        var packet = new InitialPacket(this.mapper,this.reducer,this.id,this.group);
+        var packet = new InitialPacket(this.mapper,this.reducer,this.id,this.group,this.length);
         this.messenger.publishToSelectedWorkers([sockid],"MapReduce", packet);
     }
 
-    assignJobToWorker(taskID,sockid){
+    assignTaskToWorker(taskID,sockid){
         this.count++;
         console.log('job : ' + this.count + ' out of : ' + this.length);
-        this.setTaskStatus(taskID,config.status.ACTIVE);
-        var packet = new TaskPacket(fs.readFileSync(taskID, "utf-8"), taskID, this.id, this.group);
+        this.tasks[taskID].setStatus(config.status.ACTIVE);
+        var packet = new TaskPacket(fs.readFileSync(taskID, "utf-8"), taskID, this.id, this.group, this.count);
         this.messenger.publishToSelectedWorkers([sockid], "InputSplit", packet);
     }
 

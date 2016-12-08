@@ -31,7 +31,7 @@ app.controller('uploadController', ['$scope','Upload','$timeout','$location','$l
         if (files) {
             // console.log(files);
             Upload.upload({
-                url: 'http://localhost:8080/api/InputFiles/',
+                url: '/api/InputFiles/',
                 arrayKey: '',
                 data: {
                     files: [$scope.reduceFile, $scope.mapFile, $scope.dataFile],

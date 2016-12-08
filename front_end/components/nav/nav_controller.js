@@ -7,6 +7,21 @@ app.controller('navController', ['TaskHandler','User','$rootScope','$scope','$lo
         });
        
     });
+     $scope.$on('Counters', (event,data) =>{
+        $scope.$apply(()=> {
+            console.log('Counters\n\n\n\n AYY');
+            console.log(data);
+            $rootScope._counters = data;
+        });
+    });
+
+    $scope.$on('ReducerUpdate', (event, data) => {
+        $scope.$apply(() =>{
+            console.log('Reducer Update');
+            console.log(data);
+            $rootScope._reducerData = data;
+        });
+    });
   
     $rootScope.$watch('_user', () => {
         if($rootScope._user) {

@@ -29,6 +29,10 @@ class ReducerManager {
     getCount(group_id, job_id) {
         return this.jobs[group_id][job_id].count;
     }
+    deleteJob(group_id, job_id) {
+        var group = this.jobs[group_id];
+        delete group[job_id];
+    }
     jobExists(group_id,job_id){
         return this.jobs[group_id] && this.jobs[group_id][job_id] != null;
     }

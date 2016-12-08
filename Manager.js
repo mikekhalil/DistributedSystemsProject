@@ -112,6 +112,7 @@ messenger.inchannel.subscribe("Results", function(msg) {
         if(nextTask == null && job.isComplete()){
             console.log('finished job');
             gm.finishedJob(group_id);
+            messenger.publishTo("worker", "DashboardData", {users: gm.users, jobs : gm.jobs});
         }
     }
     else {

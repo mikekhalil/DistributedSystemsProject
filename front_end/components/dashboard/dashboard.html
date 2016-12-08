@@ -8,13 +8,18 @@
   <div class="card-header" data-background-color="green">
     <div class="nav-tabs-navigation">
       <div class="nav-tabs-wrapper">
-        <span class="nav-tabs-title">Groups:</span>
+        <span class="nav-tabs-title"><h5> Groups:</h5></span>
         <ul class="nav nav-tabs" data-tabs="tabs">
-          <li class="active">
-            <a data-toggle="tab" href="#first">First
+          
+         
+            <li ng-repeat ="group in my_groups" >
+            <a data-toggle="tab" ng-click="selected(group)"> <h5>{{group}}</h5>
             <div class="ripple-container"></div></a>
           </li>
+        
         </ul>
+        
+        </div>
       </div>
     </div>
   </div>
@@ -29,7 +34,7 @@
                 <i class="material-icons">account_circle</i>
               </div>
               <div class="card-content">
-                <p class="category">Users Online</p>
+                <p class="category">Nodes in Cluster</p>
              
                 <h3 class="title">{{_dashboardData.users[group].length}}</h3>
               </div>
@@ -43,7 +48,7 @@
               </div>
               <div class="card-content">
                 <p class="category">Jobs Finished</p>
-                <h3 class="title">34,245</h3>
+                <h3 class="title">{{completed_jobs.length}}</h3>
               </div>
             </div>
           </div>
@@ -59,6 +64,19 @@
               </div>
             </div>
           </div>
+
+           <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="card card-stats">
+              <div class="card-header" data-background-color="blue">
+                <i class="material-icons">swap_vert</i>
+              </div>
+              <div class="card-content">
+                <p class="category">Tasks Computed Locally</p>
+                <h3 class="title"> {{_counters[group] || 0}}</h3>
+              </div>
+            </div>
+          </div>
+
 
         </div>
       </div>
@@ -118,10 +136,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="x in _dashboardData.jobs[group]">
+            <tr ng-repeat="(key, value) in _reducerData.jobs[group]">
                 <td>{{$index}}</td>
-                <td> {{x.id}}</td>
-                <td> {{x.splits.length}}</td>
+                <td> {{key}}</td>
+                <td> {{value.length}}</td>
             </tr>
             <!--<tr>
               <td>1</td>
@@ -139,7 +157,7 @@
     <div class="card">
       <div class="card-header" data-background-color="red">
         <h4 class="title">Completed Jobs</h4>
-        <p class="category">New employees on 15th September, 2016</p>
+        <p class="category">Results from the completed jobs</p>
       </div>
       <div class="card-content table-responsive">
         <table class="table table-hover">
@@ -151,10 +169,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Harry Potter</td>
-              <td>Potato Man</td>
-              <td><a href="http://www.w3schools.com" target="_blank">Result File</a> </td>
+            <tr ng-repeat="x in completed_jobs">
+              <td>{{ x.name }}</td>
+              <td>{{ x.owners[0]}}</td>
+              <td><a ng-href="{{x.results}}" target="_blank">Result File</a> </td>
             </tr>
           </tbody>
         </table>

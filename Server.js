@@ -169,12 +169,18 @@ apiRoutes.get('/user', function(req, res) {
 	});
 });   
 
-apiRoutes.post('/group', function(req,res) {
-	console.log(req.body);
-	JobSchema.find({group : req.body.group}, (err, doc) => {
-		if(!err)
-			res.json(doc);
+apiRoutes.get('/completedJobs', function(req,res) {
+	console.log(req.query);
+	JobSchema.find({group : req.query.group, results : {$ne:null}}, (err, doc) => {
+		if(err) {
+			console.log(err);
+			res.json({succeess: false, error : err});
+		}
+		else{
+			res.json({completedJobs : doc});
+		}
 	});
+	//res.json({potatos : "CREAM"});
 });
 
 

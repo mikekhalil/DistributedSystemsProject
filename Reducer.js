@@ -43,6 +43,7 @@ messenger.inchannel.subscribe("MapReduce", function(msg) {
 	console.log(msg);
 	var job = msg.data;
 	rm.registerJob(job);
+	messenger.publishTo("worker", "ReducerUpdate", {jobs :rm.jobs});
 });
 
 messenger.inchannel.subscribe("RegisterGroup", function(msg) { 
@@ -67,6 +68,18 @@ messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
 					if(err)
 						console.log(err);
 					console.log(res);
+					Job.findOne({name : job_id}, (err,doc) => {
+						doc.results = res;
+						doc.save((err)=> {
+							if(err)
+								console.log(err);
+							
+							rm.deleteJob(group_id, job_id);
+							rm.dump();
+							messenger.publishTo("worker", "ReducerUpdate", {jobs : rm.jobs});
+
+						});
+					});
 				});
 			}
 		});

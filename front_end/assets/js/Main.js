@@ -40,6 +40,11 @@ app.service('TaskHandler', function($rootScope) {
                 that.rootScope.$broadcast("ReducerUpdate", packet.data);
             });
 
+            that.mq.messenger.inchannel.subscribe("ReducerComplete", function(packet) {
+                console.log("REDUCER FINISH");
+                that.rootScope.$broadcast("ReducerComplete", packet.data);
+            });
+
             that.mq.messenger.inchannel.subscribe("InputSplit", function(packet) {
                // console.log('InputSplit Received for Group : ' + packet.data.group_id);
                 that.nodeCount[packet.data.group_id] += 1;

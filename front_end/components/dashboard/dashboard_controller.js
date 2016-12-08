@@ -1,5 +1,5 @@
 app.controller('dashboardController', ['$location', '$route', '$scope','$rootScope','User','$localStorage','$http', function($location,$route,$scope, $rootScope, User,$localStorage,$http) {
-    $scope.group = "Potato";
+    $scope.group = "Purdue";
 
     var user = new User($localStorage.currentUser.token);
     $scope.my_groups = [];
@@ -11,6 +11,12 @@ app.controller('dashboardController', ['$location', '$route', '$scope','$rootSco
     $scope.selected = (group) => {
         console.log('selected '+ group);
     }
+
+    $scope.$on('ReducerComplete', (event, data) => {
+        console.log('REDUCER COMPLETE');
+        if($scope.group == data.group_id)
+            $scope.getCompletedJobs();
+    });
    
     $scope.getCompletedJobs = function() {
         $http({

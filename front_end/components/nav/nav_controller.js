@@ -22,6 +22,8 @@ app.controller('navController', ['TaskHandler','User','$rootScope','$scope','$lo
             $rootScope._reducerData = data;
         });
     });
+
+   
   
     $rootScope.$watch('_user', () => {
         if($rootScope._user) {

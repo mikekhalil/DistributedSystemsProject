@@ -77,7 +77,7 @@ messenger.inchannel.subscribe(config.topics.RESULTS, function(msg) {
 							rm.deleteJob(group_id, job_id);
 							rm.dump();
 							messenger.publishTo("worker", "ReducerUpdate", {jobs : rm.jobs});
-
+							messenger.publishTo("worker", "ReducerComplete", {group_id : group_id, job_id })
 						});
 					});
 				});

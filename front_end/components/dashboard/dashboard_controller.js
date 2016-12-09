@@ -4,12 +4,16 @@ app.controller('dashboardController', ['$location', '$route', '$scope','$rootSco
     var user = new User($localStorage.currentUser.token);
     $scope.my_groups = [];
     $scope.completed_jobs = [];
+
     user.getData((err,rsp) => {
         $scope.my_groups = rsp.groups;
         console.log($scope.my_groups);
     });
+
     $scope.selected = (group) => {
         console.log('selected '+ group);
+        console.log("ROOT SCOPE STUFF");
+        console.log($rootScope._counters[group]);
     }
    
     $scope.getCompletedJobs = function() {
@@ -29,5 +33,51 @@ app.controller('dashboardController', ['$location', '$route', '$scope','$rootSco
         });
     }
     $scope.getCompletedJobs();
+
+    $scope.groupCluster = [1,2,3,4,5,6,7,8,9,10,11,12]; 
+    $scope.individualNode = [3,3,3,3,3,3,3,3,3,3,3,3];
+
+    // categories will just be seconds
+    var categ = [12,11,10,9,8,7,6,5,4,3,2,1];
+
+     Highcharts.chart('container', {
+        title: {
+            text: '',
+            x: -20 //center
+        },
+        subtitle: {
+            text: '',
+            x: -20
+        },
+        xAxis: {
+            categories: categ
+        },
+        yAxis: {
+            title: {
+                text: 'Tasks Computed per Second (16kb task)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: ' tasks/sec'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: [{
+            name: 'Group Cluster',
+            data: $scope.groupCluster
+        }, {
+            name: 'Individual Node',
+            data: $scope.individualNode
+        }]
+    });
 
 }]);

@@ -7,6 +7,7 @@ app.service('TaskHandler', function($rootScope) {
             this.nodeCount = {};    //job_id -> job count
             this.totalCount = {};   //progress for a job
             this.jobLength = {};    //length for a job
+            this.clock = {};
             this.socket = io();
             this.rootScope._dashboardData = {};
             this.rootScope._counters = {};
@@ -25,8 +26,11 @@ app.service('TaskHandler', function($rootScope) {
                 that.reducer[packet.data.group_id] = new Function('key', 'value', packet.data.reducer);
 
                 //TODO: Set that.jobLength[group_id] - implement serverside functionality
+                var d = new Date();
+                that.clock[packet.data.group_id] = d.getTime();
                 that.nodeCount[packet.data.group_id] = 0;
                 that.totalCount[packet.data.group_id] = 0;
+                that.rootScope.$broadcast('ClockStart', that.clock);
             });
 
             that.mq.messenger.inchannel.subscribe("DashboardData", function(packet) { 

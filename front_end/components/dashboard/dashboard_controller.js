@@ -1,10 +1,13 @@
-app.controller('dashboardController', ['$location', '$route', '$scope','$rootScope','User','$localStorage','$http', function($location,$route,$scope, $rootScope, User,$localStorage,$http) {
+app.controller('dashboardController', ['$location', '$route', '$scope','$rootScope','User','$localStorage','$http','$interval', function($location,$route,$scope, $rootScope, User,$localStorage,$http,$interval) {
+
     $scope.group = "Purdue";
 
     var user = new User($localStorage.currentUser.token);
     $scope.my_groups = [];
     $scope.completed_jobs = [];
 
+    $scope.clock = 0;
+    
     user.getData((err,rsp) => {
         $scope.my_groups = rsp.groups;
         console.log($scope.my_groups);
@@ -21,6 +24,7 @@ app.controller('dashboardController', ['$location', '$route', '$scope','$rootSco
         if($scope.group == data.group_id)
             $scope.getCompletedJobs();
     });
+
    
     $scope.getCompletedJobs = function() {
         $http({

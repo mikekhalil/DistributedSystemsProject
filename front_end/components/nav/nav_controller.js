@@ -1,4 +1,11 @@
-app.controller('navController', ['TaskHandler','User','$rootScope','$scope','$localStorage','$http','$location',  function(TaskHandler,User,$rootScope,$scope,$localStorage,$http,$location){
+app.controller('navController', ['TaskHandler','User','$rootScope','$scope','$localStorage','$http','$location', '$interval', function(TaskHandler,User,$rootScope,$scope,$localStorage,$http,$location, $interval){
+    $rootScope._clock = null;
+
+    $scope.getDifference = function(startTime){
+      
+    }
+    
+    
     $scope.$on('DashboardUpdate', (event,data) =>{
         $scope.$apply(()=> {
             console.log('broadcast\n\n\n\n AYY');
@@ -24,6 +31,28 @@ app.controller('navController', ['TaskHandler','User','$rootScope','$scope','$lo
     });
 
    
+
+
+    $scope.$on('ClockStart', (event, data) => {
+       console.log('Clock Start');
+        console.log(data);
+        console.log(data["Purdue"]);
+        var startTime = data["Purdue"];
+        // $interval($scope.getDifference(startTime), 1000);
+        //$interval((startTime) => {
+            $scope.$apply(() => {
+                console.log("GET DIFF");
+                var d = new Date();
+                var curTime = d.getTime();
+                $rootScope._clock = (curTime - startTime) / 1000;
+                console.log($rootScope._clock);
+            });
+
+       // }, 1000);
+        
+    });
+
+
   
     $rootScope.$watch('_user', () => {
         if($rootScope._user) {

@@ -14,6 +14,7 @@ app.service('TaskHandler', function($rootScope) {
             this.mq = new MessageQueue(this.socket, this.user);
             this.mq.start();
             this.mq.messenger.publishTo('manager', 'DashboardDataRequest', {sock_id : this.socket.io.engine.id});
+            this.mq.messenger.publishTo('reducer', 'ReducerRequest', {sock_id : this.socket.io.engine.id});
         }
         this.start = function() {
             var that = this;

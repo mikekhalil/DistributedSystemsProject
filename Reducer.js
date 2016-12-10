@@ -39,6 +39,12 @@ socket.on("RegisterGroup", (group) => {
 
 
 
+messenger.inchannel.subscribe("ReducerRequest", function(msg) {
+	messenger.publishTo("worker", "ReducerUpdate", {jobs : rm.jobs});
+});
+
+
+
 messenger.inchannel.subscribe("MapReduce", function(msg) {
 	console.log(msg);
 	var job = msg.data;

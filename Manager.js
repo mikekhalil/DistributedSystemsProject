@@ -128,6 +128,19 @@ messenger.inchannel.subscribe("Results", function(msg) {
 
     
 });
+messenger.inchannel.subscribe("TaskAssigned" , function(msg) {
+    //console.log('Task Assigned'); 
+    //console.log(msg); 
+    var  data = msg.data; 
+    //console.log(data); 
+    gm.startTask(data.group_id, data.sock_id, data.split); 
+});
+
+messenger.inchannel.subscribe("TaskCompleted" , function(msg) {
+    //console.log('Task Completed'); 
+    var data = msg.data; 
+    gm.endTask(data.group_id, data.sock_id, data.split); 
+});
 
 messenger.inchannel.subscribe(config.topics.CLIENT_TABLE_UPDATE, function(msg) {
     //TODO HOW DO WE UPDATE GroupManager here

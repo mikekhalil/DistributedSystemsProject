@@ -1,11 +1,13 @@
 'use strict'; 
 
 var socket = require('socket.io-client')('http://localhost:8080'); 
+var config = require(__dirname + '/../config.json');
 
 class GroupManager {
     constructor(Group){
         this.jobs = {};
         this.users = {};
+        this.tasks = {}; 
         var that = this;
         Group.find({}, function(err,groups) {
             if(err)
@@ -36,17 +38,39 @@ class GroupManager {
     removeUser(sock_id) {
         console.log('removing ' + sock_id);
         var that = this;
+        var groups = []; 
         Object.keys(this.users).forEach(function(key) {
             var users = that.users[key]
             for (var user in users) {
                 if (users[user].sock_id == sock_id) {
                    that.users[key].splice(user, 1); 
+                   groups.push(key); 
                 }
             }
             
         });
-       
+
+        for (var group_id of groups) {
+           // console.log(group_id); 
+            if (that.tasks[[group_id, sock_id]]) {
+                var split = that.tasks[[group_id, sock_id]]; 
+                //console.log("This Job was not completed "  + split); 
+                //console.log(this.jobs[group_id][0].tasks); 
+                this.jobs[group_id][0].count--; 
+                this.jobs[group_id][0].tasks[split].status  = config.status.INCOMPLETE; 
+            }
+        }
+      
+
     }
+     startTask(group_id,sock_id, split) {
+        //console.log("Starting " + split); 
+        this.tasks[[group_id, sock_id]] = split;
+    }
+    endTask(group_id, sock_id, split) {
+        //console.log("Ended " + split); 
+        this.tasks[[group_id, sock_id]] = null; 
+    }   
     
 
     registerGroup(group) {

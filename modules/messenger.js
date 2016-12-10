@@ -41,7 +41,12 @@ module.exports = function (socket, channelname){
 
 	/*route outgoing messages to socket.io server*/ 
 	module.outchannel.subscribe("outgoing", function (data) {
-		socket.emit(data.reciever, data); 
+		if (data.reciever==channelname) {
+			module.inchannel.publish(data.topic, data); 
+		}
+		else {
+			socket.emit(data.reciever, data); 
+		}
     });
 	/*recieve incoming messages and re-establish original topic*/ 
     module.inchannel.subscribe("incoming", function (data) {

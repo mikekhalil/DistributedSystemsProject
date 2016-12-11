@@ -58,8 +58,10 @@ class GroupManager {
                 var split = that.tasks[[group_id, sock_id]]; 
                 //console.log("This Job was not completed "  + split); 
                 //console.log(this.jobs[group_id][0].tasks); 
-                this.jobs[group_id][0].count--; 
-                this.jobs[group_id][0].tasks[split].status  = config.status.INCOMPLETE; 
+                if (this.jobs[group_id].length > 0) {
+                    this.jobs[group_id][0].count--; 
+                    this.jobs[group_id][0].tasks[split].status  = config.status.INCOMPLETE; 
+                }
             }
         }
       

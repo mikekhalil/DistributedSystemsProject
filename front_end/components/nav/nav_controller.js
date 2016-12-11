@@ -39,16 +39,24 @@ app.controller('navController', ['TaskHandler','User','$rootScope','$scope','$lo
         console.log(data["Purdue"]);
         var startTime = data["Purdue"];
         // $interval($scope.getDifference(startTime), 1000);
-        //$interval((startTime) => {
-            $scope.$apply(() => {
+        $rootScope._timer = $interval((startTime) => {
+            //$scope.$apply(() => {
                 console.log("GET DIFF");
                 var d = new Date();
                 var curTime = d.getTime();
-                $rootScope._clock = (curTime - startTime) / 1000;
-                console.log($rootScope._clock);
-            });
 
-       // }, 1000);
+                console.log("CURTIME");
+                console.log(curTime);
+
+                console.log("START TIME");
+                console.log(startTime);
+
+                $rootScope._clock = startTime;
+                //$rootScope._clock = (curTime - startTime)/1000;
+                console.log($rootScope._clock);
+           // });
+
+        }, 1000);
         
     });
 

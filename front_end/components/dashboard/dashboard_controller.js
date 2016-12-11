@@ -20,6 +20,8 @@ app.controller('dashboardController', ['$location', '$route', '$scope','$rootSco
     }
 
     $scope.$on('ReducerComplete', (event, data) => {
+        $interval.cancel($rootScope._timer);
+
         console.log('REDUCER COMPLETE');
         if($scope.group == data.group_id)
             $scope.getCompletedJobs();

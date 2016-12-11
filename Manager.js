@@ -120,8 +120,11 @@ messenger.inchannel.subscribe("Results", function(msg) {
         var nextTask = job.resultHandler(msg.data);
         if(nextTask == null && job.isComplete()){
             console.log('finished job');
+            var d = new Date(); 
+            messenger.publishTo("timer", "TimingEvent" , {event: 'jobEnd', id: job.id, timestamp: d.getTime()}); 
             gm.finishedJob(group_id);
             messenger.publishTo("worker", "DashboardData", {users: gm.users, jobs : gm.jobs});
+            
         }
     }
     else {

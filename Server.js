@@ -20,6 +20,7 @@ var gm = require(__dirname + '/modules/GroupManager.js');
 var Vorker = require(__dirname + '/modules/User.js'); 
 var JobSchema = require(__dirname + '/models/job.js');
 var mkdirp = require('mkdirp');
+var timer = require( __dirname +  '/modules/Timer.js'); 
 
 
 var ClientTab = [];  
@@ -376,7 +377,11 @@ io.on('connection', function(socket) {
 			io.emit('GroupManagerUpdate', GroupManager);  
 		}
 
-	}); 
+	});
+	socket.on('timer', function(event) { 
+		timer.LOG(event); 
+
+	});  
 }); 
 
 function registerClient(socket, msg) {

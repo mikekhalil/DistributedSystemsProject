@@ -13,7 +13,7 @@
         "data" : "dataFile",
         "type" : "typeOfInput"
     },
-    "components" : ["worker", "reducer", "manager", "server", "group"],
+    "components" : ["worker", "reducer", "manager", "server", "timer"],
     "REDUCE" : "reduce",
     "MAP" : "map",
     "DATA" : "data",

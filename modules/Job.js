@@ -36,6 +36,9 @@ class Job {
         var workers = GroupManager.getUsers(this.group);
       
         this.printNumberOfTasks();
+        /*Time event*/
+        var d = new Date();
+        this.messenger.publishTo("timer", "TimingEvent" , {event: 'jobStart', id: this.id, timestamp: d.getTime()}); 
     
         for(var worker of workers){
             var task = this.getNextTask();

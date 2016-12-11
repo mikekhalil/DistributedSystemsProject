@@ -31,6 +31,7 @@ class Job {
     }
 
     start(GroupManager) {
+        console.log("STARTING JOBB \n\n\n\n\n\n : " + this.id);
         this.setUpJob();
         console.log('set up');
         var workers = GroupManager.getUsers(this.group);
@@ -68,11 +69,16 @@ class Job {
         console.log('number of tasks for job [' + this.id + ']: ' + this.length);
     }
     resultHandler(res) {
+         this.count++;
         //console.log(res);
         //TODO: Add a timeout featue - if job has been active for more tha X seconds, update it to not active - assign job to another node
         //console.log("vhat"); 
         var sockid = res.sockid;
+        // console.log(res);
         var completedTask = this.tasks[res.inputSplit];
+        //console.log(this.tasks);
+        console.log(res.inputSplit);
+        // console.log(this.tasks[res.inputSplit]);
         this.tasks[completedTask.split].setStatus(config.status.COMPLETE);
         this.messenger.publishTo('manager', 'TaskCompleted', {group_id: this.group, sock_id: sockid, split: res.inputSplit}); 
         var task = this.getNextTask();
@@ -103,7 +109,7 @@ class Job {
     }
 
     assignTaskToWorker(taskID,sockid){
-        this.count++;
+       
         console.log('job : ' + this.count + ' out of : ' + this.length);
         this.tasks[taskID].setStatus(config.status.ACTIVE);
         this.tasks[taskID].setSockID(sockid); 

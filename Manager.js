@@ -115,7 +115,10 @@ messenger.inchannel.subscribe("SystemReset" , function(msg) {
 
 messenger.inchannel.subscribe("Results", function(msg) {
     var group_id = msg.data.group_id;
+    console.log("Job Queue Length : ");
+    console.log(gm.jobs[group_id].length);
     var job = gm.getCurrentJob(group_id);
+  
     if(job){
         var nextTask = job.resultHandler(msg.data);
         if(nextTask == null && job.isComplete()){

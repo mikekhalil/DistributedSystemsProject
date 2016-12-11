@@ -44,6 +44,7 @@ app.controller('groupsController', ['$rootScope','$location', '$route', '$scope'
                 closeModal('#myModal');
 				$scope.getUser();
                 $scope.getGroups();
+				$rootScope._mq.messenger.publishTo("manager", "CreateGroup", {group_id : $scope.groupName, user : $rootScope._user, sock_id: $rootScope._socket.io.engine.id });
                 
             }, 
             function(rsp) { 
@@ -66,6 +67,7 @@ app.controller('groupsController', ['$rootScope','$location', '$route', '$scope'
 			console.log(rsp);
 			$scope.getUser();
 			$scope.getGroups();
+			$rootScope._mq.messenger.publishTo("manager", "JoinGroup", {group_id : group, user : $rootScope._user, sock_id: $rootScope._socket.io.engine.id });
 		},function(rsp) {
 			//failed
 			console.log('fail');

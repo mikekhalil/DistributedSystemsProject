@@ -3,6 +3,7 @@
 var socket = require('socket.io-client')('http://localhost:8080'); 
 var config = require(__dirname + '/../config.json');
 
+
 class GroupManager {
     constructor(Group){
         this.jobs = {};
@@ -17,6 +18,7 @@ class GroupManager {
                 that.jobs[group.name] = [];
                 that.users[group.name] = [];
             }
+            that.dump();
         });
         
     }
@@ -73,10 +75,23 @@ class GroupManager {
     }   
     
 
-    registerGroup(group) {
-        this.jobs[group.name] = group.jobs;
-        this.users[group.name] = group.users;
-       
+    registerGroup(group_name, user) {
+        this.jobs[group_name] = [];
+        this.users[group_name] = [user];
+        this.dump();
+    }
+
+    joinGroup(group_name, user) {
+        this.users[group_name].push(user);
+        var job = this.getCurrentJob(group_name);
+        if(job) {
+            job.initalizeWorker(user.sock_id);
+            var task = job.getNextTask();
+            if(task){
+                job.assignTaskToWorker(task.split, user.sock_id);
+            }
+        }
+        this.dump();
     }
 
     registerJob(job) {

@@ -12,6 +12,7 @@ var mongoose    = require('mongoose');
 var Group = require(__dirname + '/models/group');
 var JobSchema = require(__dirname + '/models/job.js');
 var Job = require(__dirname + '/modules/Job.js');
+var User = require(__dirname + '/modules/User.js');
 
 
 
@@ -89,9 +90,17 @@ socket.on("RemoveUser", (sock_id) => {
 });
 
 
-socket.on("RegisterGroup", (group) => {
-	//TODO THIS WILL REQUIRE NEW DATA STRUCTURE MOST LIKELY 
-    //rm.registerGroup(group.name)
+messenger.inchannel.subscribe("CreateGroup", (msg) => {
+    console.log(msg);
+    var u = new User(msg.data.sock_id, {id: msg.data.user.email, groups: msg.data.user.groups});
+    console.log(u);
+    gm.registerGroup(msg.data.group_id, u);
+});
+
+messenger.inchannel.subscribe("JoinGroup", (msg) => {
+    var u = new User(msg.data.sock_id, {id: msg.data.user.email, groups: msg.data.user.groups});
+    console.log(u);
+    gm.joinGroup(msg.data.group_id,u);
 });
 
 

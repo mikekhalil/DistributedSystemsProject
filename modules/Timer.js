@@ -31,6 +31,7 @@ function writeJobToFile(id, endTime) {
 	var elapsed = parseInt(endTime) - startTime; 
 
 	var string  = "Job " + id + " took " + elapsed + " ms.\n"
+	console.log(string); 
 	fs.appendFile(FILENAME, string, function (err) {
 		if (err) 
 			console.log(err); 

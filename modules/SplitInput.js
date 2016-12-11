@@ -46,10 +46,10 @@ var func = function SplitInput(file, groupDir, jobDir, callback) {
         .pipe(es.split())
         .pipe(es.mapSync(function(line) {
                 s.pause();
-                split += line;
+                split += line + "\n";
                 if (split.length >= splitSize) {
                     filepath = path.join(splitDir, splitCount + '.txt');
-                    writeSplit(split + "\n", filepath);
+                    writeSplit(split, filepath);
                     splits[splitCount++] = filepath;
                     split = '';
                 }
@@ -63,7 +63,7 @@ var func = function SplitInput(file, groupDir, jobDir, callback) {
                 // write last input split to file
                 if (split.length > 0) {
                     filepath = path.join(splitDir, splitCount + '.txt');
-                    writeSplit(split + "\n", filepath);
+                    writeSplit(split, filepath);
                     splits[splitCount] = filepath;
                 }
                 callback(splits);

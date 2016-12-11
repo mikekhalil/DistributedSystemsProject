@@ -51,6 +51,7 @@ var redisDump = function(client, job_id, group_id,dir,  cb) {
 		if(err)
 			cb(err,null);	
 		dropIntoBucket(JSON.stringify(res,null,3),job_id + '-results.txt',(err,res) => {
+			client.del(hash);
 			cb(err,res);
 		});
 	});
